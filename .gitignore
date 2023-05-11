@@ -1,2 +1,8 @@
 .vim
 data
+node_modules
+.envrc
+.terraform*
+*.tfstate*
+artifacts-*.zip
+services/*/build
