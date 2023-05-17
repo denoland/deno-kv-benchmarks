@@ -17,7 +17,7 @@ build_function() (
 
 services=(
   upstash-redis
-  # dynamodb-global-tables
+  dynamodb-global-tables
   # cloud-firestore
   # cloudflare-workers-kv
 )

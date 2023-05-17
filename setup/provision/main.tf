@@ -25,4 +25,15 @@ data "aws_region" "current" {}
 locals {
     account_id = data.aws_caller_identity.current.account_id
     region = data.aws_region.current.name
+    dynamodb_table_name = "github_repos"
+    dynamodb_table_gsi_index = "github_repo_index"
+}
+
+# Provided through environment variables
+variable "UPSTASH_REDIS_HOST" {
+  type = string
+}
+
+variable "UPSTASH_REDIS_PASSWORD" {
+  type = string
 }

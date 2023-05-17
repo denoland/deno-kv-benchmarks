@@ -1,0 +1,19 @@
+{
+  "name": "dynamodb-global-tables",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc --watch -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && cp package.json build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.115",
+    "aws-lambda": "^1.0.7",
+    "typescript": "^5.0.4"
+  }
+}
