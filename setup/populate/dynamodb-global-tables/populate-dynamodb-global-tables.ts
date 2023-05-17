@@ -1,5 +1,5 @@
 import { ApiFactory } from "https://deno.land/x/aws_api@v0.8.1/client/mod.ts";
-import { DynamoDB } from "https://deno.land/x/aws_api@v0.8.1/services/dynamodb/mod.ts";
+import { DynamoDB, ScanInput, AttributeValue } from "https://deno.land/x/aws_api@v0.8.1/services/dynamodb/mod.ts";
 import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/mod.ts";
 
 const currentWorkingDir = dirname(fromFileUrl(import.meta.url));
@@ -102,6 +102,28 @@ function serialize(data: unknown): SerializedDynamoDbValue | undefined {
   }
 }
 
+async function countDynamoDbRecords(client: DynamoDB, tableName: string): Promise<bigint> {
+  const scanParameters: ScanInput = {
+    TableName: tableName,
+    Select: "COUNT",
+  };
+  let lastKey: {
+    ExclusiveStartKey: Record<string, AttributeValue | null | undefined>
+  } = { ExclusiveStartKey: {} };
+  let count = 0n;
+
+  while (lastKey.ExclusiveStartKey) {
+    const scan = await client.scan({
+      ...scanParameters,
+      ...(lastKey.ExclusiveStartKey.id && lastKey),
+    });
+    lastKey = { ExclusiveStartKey: scan.LastEvaluatedKey! };
+    count += BigInt(scan.Count || 0);
+  }
+
+  return count;
+}
+
 type GithubRepoRecord = {
   id: number;
   forks_count: number;
@@ -127,10 +149,7 @@ for (const item of dataset) {
   }
 }
 
-const { Count: storedCount } = await client.scan({
-  TableName: tableName,
-  Select: "COUNT",
-});
+const reportedCount = await countDynamoDbRecords(client, tableName);
 
 console.log(`Inserted count: ${dataset.length}`);
-console.log(`Reported count: ${storedCount}`);
+console.log(`Reported count: ${reportedCount}`);
