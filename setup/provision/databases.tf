@@ -2,6 +2,7 @@ resource "aws_dynamodb_table" "dynamodb_global_table" {
   name           = local.dynamodb_table_name
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
+  stream_enabled = true
 
   attribute {
     name = "id"
@@ -24,8 +25,6 @@ resource "aws_dynamodb_table" "dynamodb_global_table" {
     name               = local.dynamodb_table_gsi_index
     hash_key           = "host"
     range_key          = "forks_count"
-    write_capacity     = 50
-    read_capacity      = 50
     projection_type    = "KEYS_ONLY"
   }
 
