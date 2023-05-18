@@ -136,7 +136,7 @@ const client = new ApiFactory().makeNew(DynamoDB);
 
 for (const item of dataset) {
   const serialized = serialize(Object.assign(item, {
-    host: "github"
+    host: "github",
   }));
 
   if (serialized && "M" in serialized) {
@@ -144,7 +144,7 @@ for (const item of dataset) {
     // TODO: This is very slow, refactor to `batchWriteItem`
     await client.putItem({
       TableName: tableName,
-      Item: rootFields
+      Item: rootFields,
     });
   }
 }

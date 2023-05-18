@@ -6,19 +6,21 @@ script_dir=$PWD
 
 build_function() (
   local service=$1
+  local artifact_zip="$script_dir/artifacts-$service.zip"
   cd "../../services/$service"
 
-  echo "Building $service..."
+  printf "\n%s\n" "Building $service..."
   npm run build
 
   cd build
-  zip -r "$script_dir/artifacts-$service.zip" .
+  rm -f "$artifact_zip"
+  zip -r "$artifact_zip" .
 )
 
 services=(
   upstash-redis
   dynamodb-global-tables
-  # cloud-firestore
+  cloud-firestore
   # cloudflare-workers-kv
 )
 

@@ -1,0 +1,18 @@
+{
+  "name": "cloud-firestore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc --watch -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && cp package-production.json build/package.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.2.0",
+    "typescript": "^5.0.4"
+  }
+}

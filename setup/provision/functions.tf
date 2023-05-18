@@ -30,3 +30,20 @@ module "functions" {
 output "lambda_invoke_url" {
   value = module.functions.lambda_invoke_url
 }
+
+module "gcp_functions" {
+  source = "./gcp-cloud-fns"
+
+  name = "deno-cloud-fn"
+  artifact_zip = "artifacts-cloud-firestore.zip"
+  location = local.gcp_region
+  entry_point = "denoCloudFn"
+}
+
+output "function_invoke_url" {
+  value = module.gcp_functions.function_invoke_url
+}
+
+output "google_storage_bucket_id" {
+  value = module.gcp_functions.google_storage_bucket_id
+}
