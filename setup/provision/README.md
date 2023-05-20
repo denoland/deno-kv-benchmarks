@@ -8,6 +8,7 @@ resources:
  - Cloud Run API
  - Artifact Registry API
  - Cloud Build API
+ - Google Cloud Firestore API
 
 You must also deploy an [Upstash Redis] database in the
 same AWS region as the AWS Lambda function (us-west-2

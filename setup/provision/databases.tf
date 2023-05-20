@@ -67,3 +67,9 @@ output "dynamodb_table_gsi_index" {
 output "dynamodb_table_name" {
   value = local.dynamodb_table_name
 }
+
+resource "google_firestore_database" "firestore" {
+  name        = "(default)"
+  location_id = local.gcp_region
+  type        = "FIRESTORE_NATIVE"
+}

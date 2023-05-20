@@ -32,7 +32,17 @@ locals {
     region = data.aws_region.current.name
     dynamodb_table_name = "github_repos"
     dynamodb_table_gsi_index = "github_repo_index"
+    gcp_project_id = "deno-cloud-functions"
     gcp_region = "us-west1" # Oregon similar to AWS
+    gcp_firestore_collection = "repos"
+}
+
+output "gcp_project_id" {
+  value = local.gcp_project_id
+}
+
+output "gcp_firestore_collection" {
+  value = local.gcp_firestore_collection
 }
 
 # Provided through environment variables

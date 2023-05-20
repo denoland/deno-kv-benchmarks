@@ -1,0 +1,16 @@
+{
+  "name": "cloud-firestore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "populate-cloud-firestore.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@google-cloud/firestore": "^6.5.0"
+  }
+}
