@@ -8,33 +8,54 @@ terraform {
     }
 
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "4.64.0"
+    }
+
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "4.6.0"
     }
   }
 }
 
-# Configure the AWS Provider
+# Configure the providers
 provider "aws" {
   region = "us-west-2"
 }
 
 provider "google" {
-  project     = "deno-cloud-functions"
-  region      = local.gcp_region
+  project = "deno-cloud-functions"
+  region  = local.gcp_region
 }
 
+provider "cloudflare" {
+  api_token = var.CLOUDFLARE_API_TOKEN
+}
+
+# Declare locals
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
+data "cloudflare_accounts" "current" {}
 
 locals {
-    account_id = data.aws_caller_identity.current.account_id
-    region = data.aws_region.current.name
-    dynamodb_table_name = "github_repos"
+    account_id               = data.aws_caller_identity.current.account_id
+    region                   = data.aws_region.current.name
+    dynamodb_table_name      = "github_repos"
     dynamodb_table_gsi_index = "github_repo_index"
-    gcp_project_id = "deno-cloud-functions"
-    gcp_region = "us-west1" # Oregon similar to AWS
+    gcp_project_id           = "deno-cloud-functions"
+    gcp_region               = "us-west1" # Oregon similar to AWS
     gcp_firestore_collection = "repos"
+    cf_account_id            = data.cloudflare_accounts.current.accounts[0].id
+    cf_kv_namespace          = "deno_kv_ns"
+}
+
+output "cf_account_id" {
+  value = local.cf_account_id
+}
+
+output "cf_kv_namespace" {
+  value = local.cf_kv_namespace
 }
 
 output "gcp_project_id" {
@@ -51,5 +72,9 @@ variable "UPSTASH_REDIS_HOST" {
 }
 
 variable "UPSTASH_REDIS_PASSWORD" {
+  type = string
+}
+
+variable "CLOUDFLARE_API_TOKEN" {
   type = string
 }

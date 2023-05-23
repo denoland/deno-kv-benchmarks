@@ -1,0 +1,7 @@
+{
+  "tasks": {
+    // Tighter permissions would be nice but it's not clear what's needed here
+    // "build": "deno run --allow-net --allow-env --allow-read=./src --allow-write=./build ./bundle.ts"
+    "build": "deno run -A ./bundle.ts && deno fmt -q ./build"
+  }
+}

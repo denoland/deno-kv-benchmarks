@@ -1,3 +1,4 @@
+# AWS DynamoDB Database
 resource "aws_dynamodb_table" "dynamodb_global_table" {
   name           = local.dynamodb_table_name
   billing_mode   = "PAY_PER_REQUEST"
@@ -22,10 +23,10 @@ resource "aws_dynamodb_table" "dynamodb_global_table" {
   }
 
   global_secondary_index {
-    name               = local.dynamodb_table_gsi_index
-    hash_key           = "host"
-    range_key          = "forks_count"
-    projection_type    = "KEYS_ONLY"
+    name            = local.dynamodb_table_gsi_index
+    hash_key        = "host"
+    range_key       = "forks_count"
+    projection_type = "KEYS_ONLY"
   }
 
   # Global tables. The DB is already provisioned in us-west-2
@@ -68,8 +69,19 @@ output "dynamodb_table_name" {
   value = local.dynamodb_table_name
 }
 
+# GCP Firestore Database
 resource "google_firestore_database" "firestore" {
   name        = "(default)"
   location_id = local.gcp_region
   type        = "FIRESTORE_NATIVE"
+}
+
+# CloudFlare Workers KV Database
+resource "cloudflare_workers_kv_namespace" "namespace" {
+  account_id = local.cf_account_id
+  title      = local.cf_kv_namespace
+}
+
+output "cf_kv_namespace_id" {
+  value = cloudflare_workers_kv_namespace.namespace.id
 }

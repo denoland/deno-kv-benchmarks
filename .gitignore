@@ -6,3 +6,6 @@ node_modules
 *.tfstate*
 artifacts-*.zip
 services/*/build
+setup/provision/cf-*.json
+setup/provision/cf-*.log
+setup/provision/cf-*.toml
