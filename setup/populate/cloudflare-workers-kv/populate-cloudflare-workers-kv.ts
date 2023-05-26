@@ -157,9 +157,7 @@ for (let i = 0; i < dataset.length; i += batchInsertSize) {
   );
 }
 
-// For some reason the `reportedCount` is inaccurate/lower than
-// expected here... Maybe it's due to some weird caching on
-// Cloudflare KV's side?
+// Cloudflare's reported count might be a little inaccurate
 const reportedCount = await countKeys(
   keyPrefix,
   cfKvNamespaceId,

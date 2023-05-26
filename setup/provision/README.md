@@ -46,6 +46,9 @@ functions programmatically you must have a subdomain which the
 Worker dashboard creates automatically, and there's no good way
 to automate that programmatically at this time.
 
+You also **must** manually subscribe to the Workers & Pages paid
+plan _after_ adding your payment information.
+
 ## Required environment variables
 These environment variables are required to be set when
 running terraform and the scripts that provision and
@@ -54,6 +57,9 @@ populate the lambda/cloud functions.
 Some of the variables are prefixed with `TF_VAR_` to ensure that
 they're shared with Terraform.
 
+ - `DENO_DEPLOY_TOKEN`
+ - `DENO_DEPLOY_FRONTEND_PROJECT` - the frontend Fresh project that displays all the numbers
+ - `DENO_DEPLOY_BACKEND_PROJECT` - the backend project that reads & writes to Deno KV
  - `AWS_ACCESS_KEY_ID`
  - `AWS_SECRET_ACCESS_KEY`
  - `AWS_DEFAULT_REGION`
