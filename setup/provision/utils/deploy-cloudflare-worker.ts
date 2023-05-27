@@ -104,6 +104,7 @@ async function main() {
       "wrangler",
       "deploy",
       "-c", cfWorkerWranglerConfigFilePath,
+      "--var", `KV_NAMESPACE_NAME:${cf_worker_kv_namespace_name}`,
       "--var", `DENO_KV_FRONTEND_SECRET:${service_secret}`,
       "--var", `DENO_KV_FRONTEND_SECRET_HEADER:${service_secret_header}`,
       cf_worker_script_file_path

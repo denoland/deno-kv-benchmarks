@@ -51,7 +51,7 @@ locals {
     gcp_region                    = "us-west1" # Oregon similar to AWS
     gcp_firestore_collection      = "repos"
     cf_account_id                 = data.cloudflare_accounts.current.accounts[0].id
-    cf_kv_namespace               = "deno_kv_ns"
+    cf_kv_namespace               = "deno_kv_ns_store"
     backend_service_secret        = random_id.backend_service_secret.hex
     backend_service_secret_header = "x-backend-secret"
 }

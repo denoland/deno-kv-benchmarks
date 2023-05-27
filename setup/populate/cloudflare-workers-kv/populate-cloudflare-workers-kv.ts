@@ -132,6 +132,13 @@ async function bulkWrite(
     const kvRecord = {
       key: generateKey(record),
       value: JSON.stringify(record),
+      metadata: {
+        // We need to store the creation timestamp in order to know
+        // how much of a delay a client should wait before reading from
+        // a new KV record (reading too quickly after its creation is
+        // problematic)
+        createdAt: new Date().toJSON(),
+      },
     };
     return kvRecord;
   });

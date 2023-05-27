@@ -2,6 +2,7 @@
 
 const keyPrefix = "repo:";
 const maxWrittenForksCount = 90000;
+const newValueRetrievalDelayMs = 60_000; // 1 min
 
 const charPoint0 = "0".codePointAt(0)!;
 const charPoint9 = "9".codePointAt(0)!;
@@ -28,17 +29,20 @@ function generateKey(record: GithubRepoRecord) {
   return `${keyPrefix}${forksCountReversed}:${recordId}` as const;
 }
 
-type KvDbKey = KVNamespaceListKey<unknown, string>;
+type KvDbKeyMetadata = { createdAt: string; };
+type KvDbKey = KVNamespaceListKey<KvDbKeyMetadata, string>;
 
 /**
- * This function is required because 
+ * This function is required because `db.list()` will return deleted keys
+ * as null, so we have to skip them and issue another `.list()` command
+ * in order to reach the requested key count.
  */
 async function listTopN(prefix: string, count: number, db: KVNamespace): Promise<{ keys: KvDbKey[] }> {
   const keys: KvDbKey[] = [];
   let cursor = "";
 
   while (keys.length < count) {
-    const result = await db.list({
+    const result = await db.list<KvDbKeyMetadata>({
       prefix,
       limit: count,
       ...(cursor && { cursor }),
@@ -66,6 +70,10 @@ async function listTopN(prefix: string, count: number, db: KVNamespace): Promise
   return { keys };
 }
 
+function delay(durationInMs: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, durationInMs));
+}
+
 type GithubRepoRecord = {
   id: number;
   forks_count: number;
@@ -73,7 +81,8 @@ type GithubRepoRecord = {
 };
 
 type Env = {
-  deno_kv_ns: KVNamespace;
+  [key: string]: unknown;
+  KV_NAMESPACE_NAME: string;
   DENO_KV_FRONTEND_SECRET: string;
   DENO_KV_FRONTEND_SECRET_HEADER: string;
 };
@@ -85,18 +94,43 @@ export default {
     _ctx: ExecutionContext,
   ): Promise<Response> {
     const isValidSecret = request.headers.get(env.DENO_KV_FRONTEND_SECRET_HEADER) === env.DENO_KV_FRONTEND_SECRET;
-    const isValidPath = new URL(request.url).pathname === "/top-10";
+    const pathname = new URL(request.url).pathname;
+    const isValidPath = ["/top-10", "/top-10/quit"].includes(pathname);
     if (!(isValidSecret && isValidPath)) {
       return new Response("", {
         status: 400,
       });
     }
 
-    const db = env.deno_kv_ns;
+    const db = env[env.KV_NAMESPACE_NAME] as KVNamespace;
 
+    // TODO: maybe change the performance readings to only include the time
+    // spent actually querying CF KV
     const readStart = performance.now();
     const keyResponse = await listTopN(keyPrefix, 10, db);
-    const valuePromises = keyResponse.keys.map((key) => db.get(key.name, "text"));
+    const valuePromises = keyResponse.keys.map(async (key) => {
+      const now = new Date().getTime();
+      const delayedReadTimestamp = new Date(key.metadata?.createdAt!).getTime() + newValueRetrievalDelayMs;
+      let value: string | null = null;
+
+      // You can't request newly created keys on CF KV too quickly
+      if (delayedReadTimestamp > now) {
+        // Wait however much time is left until the new value read is up
+        await delay(delayedReadTimestamp - now);
+      }
+
+      // We have to loop a `get` because even though the key exists KV
+      // can take a while to return a non-null value
+      while (!(value = await db.get(key.name, "text"))) {
+        // We need to wait a while since if KV returns null and we request too
+        // quickly afterwards then CF will kill our worker due to too many KV
+        // requests. If the first request returns null then we'll wait a bit
+        // longer until we request again since CF KV takes a while to resolve
+        // the new data.
+        await delay(newValueRetrievalDelayMs / 2);
+      }
+      return value;
+    });
     const valuesJson = await Promise.all(valuePromises);
     const values: GithubRepoRecord[] = valuesJson.map((json) => JSON.parse(json!));
     const readLatency = performance.now() - readStart;
@@ -110,7 +144,11 @@ export default {
         ...record,
         forks_count: newForksCount,
       };
-      updatePromises.push(db.put(generateKey(newRecord), JSON.stringify(newRecord)));
+      updatePromises.push(db.put(generateKey(newRecord), JSON.stringify(newRecord), {
+        metadata: {
+          createdAt: new Date().toJSON(),
+        },
+      }));
     }
     const deletePromises = keyResponse.keys.map((key) => db.delete(key.name));
     await Promise.all(updatePromises.concat(deletePromises));
