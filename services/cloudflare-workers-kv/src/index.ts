@@ -1,6 +1,7 @@
 /// <reference types="./cf-worker.d.ts" />
 
 const keyPrefix = "repo:";
+const topTenSize = 10;
 const maxWrittenForksCount = 90000;
 const newValueRetrievalDelayMs = 60_000; // 1 min
 
@@ -32,11 +33,6 @@ function generateKey(record: GithubRepoRecord) {
 type KvDbKeyMetadata = { createdAt: string; };
 type KvDbKey = KVNamespaceListKey<KvDbKeyMetadata, string>;
 
-/**
- * This function is required because `db.list()` will return deleted keys
- * as null, so we have to skip them and issue another `.list()` command
- * in order to reach the requested key count.
- */
 async function listTopN(prefix: string, count: number, db: KVNamespace): Promise<{ keys: KvDbKey[] }> {
   const keys: KvDbKey[] = [];
   let cursor = "";
@@ -95,7 +91,7 @@ export default {
   ): Promise<Response> {
     const isValidSecret = request.headers.get(env.DENO_KV_FRONTEND_SECRET_HEADER) === env.DENO_KV_FRONTEND_SECRET;
     const pathname = new URL(request.url).pathname;
-    const isValidPath = ["/top-10", "/top-10/quit"].includes(pathname);
+    const isValidPath = pathname === "/top-10";
     if (!(isValidSecret && isValidPath)) {
       return new Response("", {
         status: 400,
@@ -104,10 +100,8 @@ export default {
 
     const db = env[env.KV_NAMESPACE_NAME] as KVNamespace;
 
-    // TODO: maybe change the performance readings to only include the time
-    // spent actually querying CF KV
-    const readStart = performance.now();
-    const keyResponse = await listTopN(keyPrefix, 10, db);
+    let readLatency = 0;
+    const keyResponse = await listTopN(keyPrefix, topTenSize, db);
     const valuePromises = keyResponse.keys.map(async (key) => {
       const now = new Date().getTime();
       const delayedReadTimestamp = new Date(key.metadata?.createdAt!).getTime() + newValueRetrievalDelayMs;
@@ -115,25 +109,36 @@ export default {
 
       // You can't request newly created keys on CF KV too quickly
       if (delayedReadTimestamp > now) {
-        // Wait however much time is left until the new value read is up
+        // Wait however much time is left until the new value read delay is up
         await delay(delayedReadTimestamp - now);
       }
 
       // We have to loop a `get` because even though the key exists KV
       // can take a while to return a non-null value
-      while (!(value = await db.get(key.name, "text"))) {
-        // We need to wait a while since if KV returns null and we request too
-        // quickly afterwards then CF will kill our worker due to too many KV
-        // requests. If the first request returns null then we'll wait a bit
-        // longer until we request again since CF KV takes a while to resolve
-        // the new data.
-        await delay(newValueRetrievalDelayMs / 2);
+      while (!value) {
+        // Since we're forced to potentially wait 60 seconds since the last
+        // key write with KV, we only count the time spend directly requesting
+        // from the DB since the delay is constant, unavoidable, and is
+        // unrelated to the actual DB performance.
+        const readStart = performance.now();
+        value = await db.get(key.name, "text");
+        readLatency = performance.now() - readStart;
+
+        if (!value) {
+          // We need to wait a while since if KV returns null and we request too
+          // quickly afterwards then CF will kill our worker due to too many KV
+          // requests. If the first request returns null then we'll wait a bit
+          // longer until we request again since CF KV takes a while to resolve
+          // the new data.
+          await delay(newValueRetrievalDelayMs / 2);
+        }
       }
       return value;
     });
     const valuesJson = await Promise.all(valuePromises);
+    const readDeserializeStart = performance.now();
     const values: GithubRepoRecord[] = valuesJson.map((json) => JSON.parse(json!));
-    const readLatency = performance.now() - readStart;
+    readLatency += performance.now() - readDeserializeStart;
 
     const writeStart = performance.now();
     const updatePromises: Promise<void>[] = [];
