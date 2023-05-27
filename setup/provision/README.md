@@ -5,6 +5,10 @@ and populate the various resources. They also need to use
 Terraform's state file in addition to the environment variables
 listed below to populate the databases.
 
+Terraform is treated as the source of truth and everything else,
+scripts, services, etc, all refer to Terraform's state to
+provision and configure things.
+
 ## Tools used to test this Terraform code
 
 | Name | Version |
@@ -48,6 +52,12 @@ to automate that programmatically at this time.
 
 You also **must** manually subscribe to the Workers & Pages paid
 plan _after_ adding your payment information.
+
+You can find a log of `wrangler`'s output stored in
+`setup/provision/cf-wrangler.log` from the project root after you
+run `terraform apply`. The file won't be updated/wrangler won't be
+run if the source file (`services/cloudflare-workers-kv/src/index.ts`)
+hasn't been updated since the last time `wrangler` was run.
 
 ## Required environment variables
 These environment variables are required to be set when

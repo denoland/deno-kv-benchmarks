@@ -54,12 +54,14 @@ output "google_storage_bucket_id" {
 module "cf_worker_functions" {
   source = "./cf-worker-fns"
 
-  name                 = "deno-worker-fn"
-  account_id           = local.cf_account_id
-  script_path          = abspath("../../services/cloudflare-workers-kv/build/index.js")
-  kv_namespace_binding = local.cf_kv_namespace
-  kv_namespace_id      = cloudflare_workers_kv_namespace.namespace.id
-  wrangler_deno_script = "./utils/deploy-cloudflare-worker.ts"
+  name                  = "deno-worker-fn"
+  account_id            = local.cf_account_id
+  script_path           = abspath("../../services/cloudflare-workers-kv/build/index.js")
+  kv_namespace_binding  = local.cf_kv_namespace
+  kv_namespace_id       = cloudflare_workers_kv_namespace.namespace.id
+  wrangler_deno_script  = "./utils/deploy-cloudflare-worker.ts"
+  service_secret        = local.backend_service_secret
+  service_secret_header = local.backend_service_secret_header
 }
 
 output "cf_wrangler_output" {

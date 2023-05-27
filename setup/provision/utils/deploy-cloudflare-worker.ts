@@ -68,6 +68,8 @@ async function main() {
     cf_worker_script_file_path,
     cf_worker_kv_namespace_name,
     cf_worker_kv_namespace_id,
+    service_secret,
+    service_secret_header,
   } = parsedInput as Record<string, string>;
 
   const sourceCode = await Deno.readTextFile(cf_worker_script_file_path);
@@ -99,7 +101,12 @@ async function main() {
     };
 
     const wranglerOutput = await runCommand([
-      "wrangler", "deploy", "-c", cfWorkerWranglerConfigFilePath, cf_worker_script_file_path
+      "wrangler",
+      "deploy",
+      "-c", cfWorkerWranglerConfigFilePath,
+      "--var", `DENO_KV_FRONTEND_SECRET:${service_secret}`,
+      "--var", `DENO_KV_FRONTEND_SECRET_HEADER:${service_secret_header}`,
+      cf_worker_script_file_path
     ], {
       environment: {
         ...denoEnv,

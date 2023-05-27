@@ -50,15 +50,29 @@ if (!cfKvNamespaceId) {
   Deno.exit(1);
 }
 
+const charPoint0 = "0".codePointAt(0)!;
+const charPoint9 = "9".codePointAt(0)!;
+
 /**
  * Generates a key name of repo:$FORK_COUNT:$REPO_ID with padding
  * to facilitate ordering by fork_count since Cloudflare KV
  * doesn't support secondary indexes.
+ *
+ * Due to CF KV being incapable of listing keys in reverse we
+ * must reverse the key before storing it ourselves to enable
+ * fetching the "top N" records.
  */
 function generateKey(record: GithubRepoRecord) {
   const forksCount = String(record.forks_count).padStart(6, "0");
+  let forksCountReversed = "";
+  for (const char of forksCount) {
+      // Reverse the digits
+      const oldCharCodePoint = char.codePointAt(0)!;
+      const newCharCodePoint = charPoint0 + (charPoint9 - oldCharCodePoint);
+      forksCountReversed += String.fromCodePoint(newCharCodePoint);
+  }
   const recordId = String(record.id).padStart(12, "0");
-  return `${keyPrefix}${forksCount}:${recordId}` as const;
+  return `${keyPrefix}${forksCountReversed}:${recordId}` as const;
 }
 
 async function countKeys(

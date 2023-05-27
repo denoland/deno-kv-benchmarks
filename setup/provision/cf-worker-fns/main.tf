@@ -38,6 +38,14 @@ variable "wrangler_deno_script" {
   type = string
 }
 
+variable "service_secret" {
+  type = string
+}
+
+variable "service_secret_header" {
+  type = string
+}
+
 data "external" "deno_deployment_script" {
   program = ["deno", "run", "-A", var.wrangler_deno_script]
 
@@ -47,6 +55,8 @@ data "external" "deno_deployment_script" {
     cf_worker_script_file_path  = var.script_path
     cf_worker_kv_namespace_name = var.kv_namespace_binding
     cf_worker_kv_namespace_id   = var.kv_namespace_id
+    service_secret              = var.service_secret
+    service_secret_header       = var.service_secret_header
   }
 }
 

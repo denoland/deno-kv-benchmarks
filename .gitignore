@@ -6,6 +6,7 @@ node_modules
 *.tfstate*
 artifacts-*.zip
 services/*/build
+services/deno-kv/src/config.json
 setup/provision/cf-*.json
 setup/provision/cf-*.log
 setup/provision/cf-*.toml

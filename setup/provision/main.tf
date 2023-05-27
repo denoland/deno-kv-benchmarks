@@ -38,16 +38,30 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 data "cloudflare_accounts" "current" {}
 
+resource "random_id" "backend_service_secret" {
+  byte_length = 32
+}
+
 locals {
-    account_id               = data.aws_caller_identity.current.account_id
-    region                   = data.aws_region.current.name
-    dynamodb_table_name      = "github_repos"
-    dynamodb_table_gsi_index = "github_repo_index"
-    gcp_project_id           = "deno-cloud-functions"
-    gcp_region               = "us-west1" # Oregon similar to AWS
-    gcp_firestore_collection = "repos"
-    cf_account_id            = data.cloudflare_accounts.current.accounts[0].id
-    cf_kv_namespace          = "deno_kv_ns"
+    account_id                    = data.aws_caller_identity.current.account_id
+    region                        = data.aws_region.current.name
+    dynamodb_table_name           = "github_repos"
+    dynamodb_table_gsi_index      = "github_repo_index"
+    gcp_project_id                = "deno-cloud-functions"
+    gcp_region                    = "us-west1" # Oregon similar to AWS
+    gcp_firestore_collection      = "repos"
+    cf_account_id                 = data.cloudflare_accounts.current.accounts[0].id
+    cf_kv_namespace               = "deno_kv_ns"
+    backend_service_secret        = random_id.backend_service_secret.hex
+    backend_service_secret_header = "x-backend-secret"
+}
+
+output "backend_service_secret_header" {
+  value = local.backend_service_secret_header
+}
+
+output "backend_service_secret" {
+  value = local.backend_service_secret
 }
 
 output "cf_account_id" {
