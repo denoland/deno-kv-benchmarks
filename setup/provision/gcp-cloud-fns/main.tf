@@ -15,6 +15,18 @@ variable "entry_point" {
   type = string
 }
 
+variable "firestore_collection" {
+  type = string
+}
+
+variable "service_secret" {
+  type = string
+}
+
+variable "service_secret_header" {
+  type = string
+}
+
 resource "random_id" "bucket_id" {
   byte_length = 4
 }
@@ -40,12 +52,12 @@ resource "google_storage_bucket_object" "object" {
 }
 
 resource "google_cloudfunctions2_function" "function" {
-  name = "deno-cloud-fn-deployment"
-  location = var.location
+  name        = "deno-cloud-fn-deployment"
+  location    = var.location
   description = "deno-cloud-fn-deployment"
 
   build_config {
-    runtime = "nodejs18"
+    runtime     = "nodejs18"
     entry_point = var.entry_point  # Set the entry point 
     source {
       storage_source {
@@ -56,21 +68,39 @@ resource "google_cloudfunctions2_function" "function" {
   }
 
   service_config {
-    max_instance_count  = 4
-    available_memory    = "256M"
-    timeout_seconds     = 60
+    max_instance_count = 4
+    available_memory   = "256M"
+    timeout_seconds    = 60
+
+    environment_variables = {
+      BACKEND_FIRESTORE_COLLECTION   = var.firestore_collection
+      DENO_KV_FRONTEND_SECRET        = var.service_secret
+      DENO_KV_FRONTEND_SECRET_HEADER = var.service_secret_header
+    }
+  }
+
+  lifecycle {
+    replace_triggered_by = [
+      google_storage_bucket_object.object
+    ]
   }
 }
 
 # IAM entry for all users to invoke the function
 resource "google_cloud_run_service_iam_binding" "member" {
   location = google_cloudfunctions2_function.function.location
-  service = google_cloudfunctions2_function.function.name
+  service  = google_cloudfunctions2_function.function.name
 
-  role = "roles/run.invoker"
+  role    = "roles/run.invoker"
   members = [
-    "allUsers"
+    "allUsers",
   ]
+
+  lifecycle {
+    replace_triggered_by = [
+      google_storage_bucket_object.object
+    ]
+  }
 }
 
 output "function_invoke_url" { 

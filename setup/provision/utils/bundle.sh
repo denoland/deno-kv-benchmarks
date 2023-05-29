@@ -42,6 +42,7 @@ build_function() (
   local project_type=${deno_project[0]:+Deno}
   local project_type=${project_type:-Node}
   local checksum_files=
+  local exit_status=
 
   printf "\n%s\n" "Building '$service' with $project_type..."
 
@@ -50,6 +51,7 @@ build_function() (
 
     rm -rf build
     deno task build
+    exit_status=$?
 
     cd build
     reset_file_modified_dates
@@ -61,6 +63,7 @@ build_function() (
 
     rm -rf build
     npm run build
+    exit_status=$?
 
     cd build
     reset_file_modified_dates
@@ -68,6 +71,8 @@ build_function() (
     rm -f "$artifact_zip"
     TZ=UTC zip -r "$artifact_zip" .
   fi
+
+  exit $exit_status
 )
 
 services=(
@@ -79,4 +84,9 @@ services=(
 
 for service in "${services[@]}"; do
   build_function "$service"
+  status=$?
+
+  if [[ $status != 0 ]]; then
+    exit $status
+  fi
 done

@@ -90,8 +90,7 @@ export default {
     _ctx: ExecutionContext,
   ): Promise<Response> {
     const isValidSecret = request.headers.get(env.DENO_KV_FRONTEND_SECRET_HEADER) === env.DENO_KV_FRONTEND_SECRET;
-    const pathname = new URL(request.url).pathname;
-    const isValidPath = pathname === "/top-10";
+    const isValidPath = new URL(request.url).pathname === "/top-10";
     if (!(isValidSecret && isValidPath)) {
       return new Response("", {
         status: 400,

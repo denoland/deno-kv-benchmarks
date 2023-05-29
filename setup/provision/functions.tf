@@ -36,10 +36,13 @@ output "lambda_invoke_url" {
 module "gcp_functions" {
   source = "./gcp-cloud-fns"
 
-  name         = "deno-cloud-fn"
-  artifact_zip = "artifacts-cloud-firestore.zip"
-  location     = local.gcp_region
-  entry_point  = "denoCloudFn"
+  name                  = "deno-cloud-fn"
+  artifact_zip          = "artifacts-cloud-firestore.zip"
+  location              = local.gcp_region
+  entry_point           = "denoCloudFn"
+  firestore_collection  = local.gcp_firestore_collection
+  service_secret        = local.backend_service_secret
+  service_secret_header = local.backend_service_secret_header
 }
 
 output "function_invoke_url" {
