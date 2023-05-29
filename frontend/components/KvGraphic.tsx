@@ -2,7 +2,7 @@ import { JSX } from "preact";
 
 export function KVGraphic() {
   return (
-    <svg width="900" height="500" viewBox="0 0 900 500" class="w-full">
+    <svg viewBox="0 0 900 500" height="140" class="ml-[-1.8rem]">
       <rect fill="#142935" x="-7" y="-5" width="14" height="10" rx="4" ry="4" opacity="0"></rect>
       <rect fill="#142935" x="-5" y="-3" width="10" height="6" rx="4" ry="4" opacity="0"></rect>
       <rect fill="#142935" x="14.428571428571427" y="-5" width="14" height="10" rx="4" ry="4" opacity="0"></rect>
