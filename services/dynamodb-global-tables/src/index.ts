@@ -10,7 +10,6 @@ const {
 } = process.env as Record<string, string>;
 
 const maxWrittenForksCount = 90000;
-const forksField = "forks_count";
 
 async function getTopN(
   tableName: string,
@@ -23,6 +22,9 @@ async function getTopN(
     IndexName: indexName,
     Limit: limit,
     ScanIndexForward: false,
+    // `host` is the hash key, while `forks_count` is the range key
+    // so we should be getting records ordered by the range key
+    // (since the host key is always the same)
     KeyConditionExpression: `host = :host_name`,
     ExpressionAttributeValues: {
       ":host_name": {
@@ -54,7 +56,7 @@ async function getTopN(
     .Responses![tableName]
     .map((record) => unmarshall(record));
 
-  return documents as GithubRepoRecord[];
+  return (documents as GithubRepoRecord[]).sort((a, b) => b.forks_count - a.forks_count);
 }
 
 const db = new DynamoDB({});
