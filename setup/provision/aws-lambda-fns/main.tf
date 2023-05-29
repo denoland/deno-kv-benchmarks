@@ -87,6 +87,7 @@ resource "aws_lambda_function" "lambda" {
   role          = aws_iam_role.role[each.key].arn
   handler       = "index.handler"
   runtime       = "nodejs18.x"
+  timeout       = 60 * 15
 
   environment {
     variables = each.value.variables
@@ -109,8 +110,36 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_access" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "dynamodb:*",
+    ]
+
+    resources = ["arn:aws:logs:*:*:*", "arn:aws:dynamodb:*:*:*"]
+  }
+}
+
+resource "aws_iam_policy" "lambda_access" {
+  name        = "lambda_access"
+  path        = "/"
+  description = "IAM policy for logging from a lambda"
+  policy      = data.aws_iam_policy_document.lambda_access.json
+}
+
 resource "aws_iam_role" "role" {
   for_each           = var.fns
   name               = "deno-lambda-${each.key}-key"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_access" {
+  for_each   = var.fns
+  role       = aws_iam_role.role[each.key].name
+  policy_arn = aws_iam_policy.lambda_access.arn
 }

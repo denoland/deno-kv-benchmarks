@@ -12,7 +12,10 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.341.0",
+    "@aws-sdk/util-dynamodb": "^3.341.0",
     "@types/aws-lambda": "^8.10.115",
+    "@types/node": "^20.2.5",
     "aws-lambda": "^1.0.7",
     "typescript": "^5.0.4"
   }

@@ -5,7 +5,7 @@ module "functions" {
   region     = local.region
   account_id = local.account_id
 
-  # The .zip artifacts are created by the ./bundle.sh script
+  # The .zip artifacts are created by the ./utils/bundle.sh script
   # It should be run every time code is updated in ../../services/
   fns = {
     "upstash-redis" = {
@@ -21,8 +21,10 @@ module "functions" {
       artifact_zip = "artifacts-dynamodb-global-tables.zip"
       pathname     = "dynamodb-global-tables"
       variables    = {
-        DYNAMODB_TABLE_NAME      = local.dynamodb_table_name
-        DYNAMODB_TABLE_GSI_INDEX = local.dynamodb_table_gsi_index
+        DYNAMODB_TABLE_NAME            = local.dynamodb_table_name
+        DYNAMODB_TABLE_GSI_INDEX       = local.dynamodb_table_gsi_index
+        DENO_KV_FRONTEND_SECRET        = local.backend_service_secret
+        DENO_KV_FRONTEND_SECRET_HEADER = local.backend_service_secret_header
       }
     }
   }
