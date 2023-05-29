@@ -12,8 +12,10 @@ module "functions" {
       artifact_zip = "artifacts-upstash-redis.zip"
       pathname     = "upstash-redis"
       variables    = {
-        UPSTASH_REDIS_HOST     = var.UPSTASH_REDIS_HOST
-        UPSTASH_REDIS_PASSWORD = var.UPSTASH_REDIS_PASSWORD
+        UPSTASH_REDIS_HOST             = var.UPSTASH_REDIS_HOST
+        UPSTASH_REDIS_PASSWORD         = var.UPSTASH_REDIS_PASSWORD
+        DENO_KV_FRONTEND_SECRET        = local.backend_service_secret
+        DENO_KV_FRONTEND_SECRET_HEADER = local.backend_service_secret_header
       }
     }
 
