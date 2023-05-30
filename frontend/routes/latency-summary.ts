@@ -5,6 +5,8 @@ import { LatencyResponse, LatencyOnlyResponse } from "../lib/types.ts";
 const secret = config.DENO_KV_FRONTEND_SECRET!;
 const secretHeader = config.DENO_KV_FRONTEND_SECRET_HEADER!;
 
+const db = await Deno.openKv();
+
 export const handler: Handlers = {
   async GET(_req: Request, _ctx: HandlerContext) {
     const latencyDataRequests = Object
