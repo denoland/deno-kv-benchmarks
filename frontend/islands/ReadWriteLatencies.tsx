@@ -2,7 +2,8 @@ import { IS_BROWSER } from "$fresh/runtime.ts";
 import { ComponentChildren } from "preact";
 import { latencyData, loadLatencyData } from "../lib/latency-data.ts";
 import { measurementReadKey, measurementWriteKey, prettyServiceNames } from "../lib/constants.ts";
-import { Percentiles } from "../lib/utils.ts";
+import { capitalize } from "../lib/utils.ts";
+import type { Percentiles } from "../lib/utils.ts";
 
 export type LatencyChartProps = {
   percentile: Percentiles;
@@ -42,6 +43,7 @@ export default function LatencyChart(props: LatencyChartProps) {
   }
 
   const chartData = {
+    name: `${capitalize(props.operation)} Latency`,
     data,
     labels,
   };
@@ -75,7 +77,10 @@ export default function LatencyChart(props: LatencyChartProps) {
                   // },
                   animations: { enabled: false },
                 },
-                series: [{ data: deserialized.data }],
+                series: [{
+                  name: deserialized.name,
+                  data: deserialized.data,
+                }],
                 // legend: {
                 //   show: true,
                 //   showForSingleSeries: true,
