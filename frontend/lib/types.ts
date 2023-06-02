@@ -1,3 +1,5 @@
+import type { QuantileCalculations } from "./utils.ts";
+
 export type GithubRepoRecord = {
   id: number;
   forks_count: number;
@@ -13,3 +15,8 @@ export type LatencyResponse = {
 };
 
 export type LatencyOnlyResponse = Omit<LatencyResponse, "records">;
+
+export type LatencySummaryResponse = {
+  currentRequestLatencies: Record<string, LatencyOnlyResponse>;
+  percentileData: QuantileCalculations;
+}

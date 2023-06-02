@@ -1,14 +1,23 @@
 import { Head } from "$fresh/runtime.ts";
+import { asset } from "$fresh/runtime.ts";
 import { ComponentChildren } from "preact";
 import { KVGraphic } from "../components/KvGraphic.tsx";
-import WriteLatencies from "../islands/WriteLatencies.tsx";
+import ReadWriteLatencies from "../islands/ReadWriteLatencies.tsx";
+import CurrentRequest from "../islands/CurrentRequest.tsx";
 
 function Link({ children, url }: { children: ComponentChildren; url: string; }) {
   return (
-    // <a class="text-underline" href="https://docs.github.com/en/rest">
     <a class="text-underline" href={url}>
       {children}
     </a>
+  );
+}
+
+function PercentileHeader({ children }: { children: ComponentChildren; }) {
+  return (
+    <h3 class="text-xl mt-6 mb-3 ml-2 text-blue-500 font-bold">
+      — {children}
+    </h3>
   );
 }
 
@@ -31,6 +40,7 @@ export default function Home() {
         <title>Deno KV Latency Comparison</title>
         <link rel="icon" href="/favicon.svg"/>
         <style>{baseStyles}</style>
+        <script src={asset("/vendor/apexcharts.js")} />
       </Head>
       <main class="flex flex-col w-full">
         <header class="bg-gray-900 flex flex-row justify-center py-5">
@@ -52,18 +62,52 @@ export default function Home() {
           <p class="mt-5">
             We have inserted 14,275 records into each database. Each record is Github repo metadata
             obtained from the <Link url="https://docs.github.com/en/rest">Github API</Link> using the
-            search endpoint that just listed the most popular repositories across a few categories. Each
-            database sorts the articles by the <code class="font-bold">forks_count</code> field.
+            search endpoint, which was used to list the most popular repositories across a few
+            select categories. Each database has an index on the <code class="font-bold">forks_count</code>{" "}
+            field.
           </p>
         </div>
-        <div class="max-w-screen-xl w-full mx-auto mt-10 h-full py-10 px-10 bg-gray-100">
+        <div class="max-w-screen-xl w-full mx-auto mt-10 h-full flex flex-row text-white">
+          <h2 class="py-5 pl-10 pr-7 text-xl bg-gray-800 whitespace-nowrap">Current Request ➝</h2>
+          <div class="w-full flex flex-row items-center justify-center bg-gray-400">
+            <CurrentRequest />
+          </div>
+        </div>
+        <div class="max-w-screen-xl w-full mx-auto h-full py-10 mb-10 px-10 bg-gray-100">
           <div class="text-xl">
             <h2 class="text-3xl">Read Latency</h2>
-            <p>numbers...</p>
-            <h2 class="text-3xl mt-4">Write Latency</h2>
-            <p>
-              <div><WriteLatencies /></div>
-            </p>
+
+            <PercentileHeader>50th percentile</PercentileHeader>
+            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="50" operation="read" />
+            </div>
+
+            <PercentileHeader>99th percentile</PercentileHeader>
+            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="99" operation="read" />
+            </div>
+
+            <PercentileHeader>99.9th percentile</PercentileHeader>
+            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="99.9" operation="read" />
+            </div>
+
+            <h2 class="text-3xl mt-10">Write Latency</h2>
+
+            <PercentileHeader>50th percentile</PercentileHeader>
+            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="50" operation="write" />
+            </div>
+
+            <PercentileHeader>99th percentile</PercentileHeader>
+            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="99" operation="write" />
+            </div>
+
+            <PercentileHeader>99.9th percentile</PercentileHeader>
+            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="99.9" operation="write" />
+            </div>
           </div>
         </div>
       </main>

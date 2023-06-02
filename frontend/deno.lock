@@ -155,6 +155,7 @@
     "https://esm.sh/*@preact/signals-core@1.2.3": "40fc366f6816cf9eb5a0e25aa79fd531b851a70f678f8d6b348feb43624c09e5",
     "https://esm.sh/*@preact/signals@1.1.3": "f1591d7185a00b6f96fdf5f72a99bb7dde37c0e946c8854da71db6b99d430947",
     "https://esm.sh/*preact-render-to-string@5.2.6": "c1151464d7980f7ca562b6f620386465cadaee4cbadb0e52ce385a7e8c46d41a",
+    "https://esm.sh/d3-array@3.2.4": "8333740e702e54c69453c32c7f1b37b8564bde279c04b0a22994b7aa436e93df",
     "https://esm.sh/preact@10.13.1": "ae382301328ab874e2c42bee76e261bb8d094673fe76ca7eb71917636d43d8ad",
     "https://esm.sh/preact@10.13.1/hooks": "1813f80c6d648f8137a62569e35972b0716f92539f192d6db66d45b7aafea43a",
     "https://esm.sh/preact@10.13.1/jsx-runtime": "0caf2b2eade93af59e89abc31816b6cb2829a9b8a82b958c0ebc1d8bec241e2a",
@@ -179,11 +180,36 @@
     "https://esm.sh/v124/@preact/signals-core@1.2.3/X-ZS8q/dist/signals-core.d.ts": "e39c59670049b772b2c7748907af01f4fb5d5706b88fa8266d9135925ca5baf7",
     "https://esm.sh/v124/@preact/signals@1.1.3/X-ZS8q/deno/signals.mjs": "9107036efc63362c0d88965534957e5c9e3cc4c6da6f10f7a7dcb3e8a29fb624",
     "https://esm.sh/v124/@preact/signals@1.1.3/X-ZS8q/dist/signals.d.ts": "2c766d8d5911bcbb1aac4ac1da8965e830c54bcb96da8feb4f4b3e5dcd9ee02c",
+    "https://esm.sh/v124/@types/d3-array@3.0.5/index.d.ts": "4fa5c6721346cafc445797831da394916f173d79a8343ac8bbf183d06042e869",
+    "https://esm.sh/v124/d3-array@3.2.4/deno/d3-array.mjs": "51a76826c36c1c5fdd4a6a985e15c14daff0f9282a37ad64fca8694bfb955a5a",
+    "https://esm.sh/v124/internmap@2.0.3/deno/internmap.mjs": "888a2d00b3b9aa13eec97d36764bbe859d4c00004015ac84e7625bab9889eb44",
     "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/8031f71afa1bbcd3237a94b11f53a2e5c5c0e7bf/deps.ts": "b7248e5b750be62613a9417f407e65ed43726d83b11f9631d6dbb58634bbd7d1",
     "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/8031f71afa1bbcd3237a94b11f53a2e5c5c0e7bf/mod.ts": "3e507379372361162f93325a216b86f6098defb5bb60144555b507bca26d061f",
     "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/8031f71afa1bbcd3237a94b11f53a2e5c5c0e7bf/src/deno.ts": "71bee6b14e72ca193c0686d8b4f1f47d639a64745b6f5c7576f7a3616f436f57",
     "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/8031f71afa1bbcd3237a94b11f53a2e5c5c0e7bf/src/native_loader.ts": "2a0f5a7b68a57c4651ad48161b32532356b434597a6cf282683427482b38f6fa",
     "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/8031f71afa1bbcd3237a94b11f53a2e5c5c0e7bf/src/portable_loader.ts": "47adb6d9a00f13a87d0a15f2af79118eb93503234008c31392d71270bc0a42fa",
     "https://raw.githubusercontent.com/lucacasonato/esbuild_deno_loader/8031f71afa1bbcd3237a94b11f53a2e5c5c0e7bf/src/shared.ts": "007e8d575cb6ebcac4110f1f72188a8bec3aa29287b4ad26e98403c00bebf036"
+  },
+  "npm": {
+    "specifiers": {
+      "@types/d3-array@3.0.5": "@types/d3-array@3.0.5",
+      "d3-array@3.2.4": "d3-array@3.2.4"
+    },
+    "packages": {
+      "@types/d3-array@3.0.5": {
+        "integrity": "sha512-Qk7fpJ6qFp+26VeQ47WY0mkwXaiq8+76RJcncDEfMc2ocRzXLO67bLFRNI4OX1aGBoPzsM5Y2T+/m1pldOgD+A==",
+        "dependencies": {}
+      },
+      "d3-array@3.2.4": {
+        "integrity": "sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==",
+        "dependencies": {
+          "internmap": "internmap@2.0.3"
+        }
+      },
+      "internmap@2.0.3": {
+        "integrity": "sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==",
+        "dependencies": {}
+      }
+    }
   }
 }

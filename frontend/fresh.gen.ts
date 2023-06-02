@@ -3,17 +3,21 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import config from "./deno.json" assert { type: "json" };
-import * as $0 from "./routes/index.tsx";
-import * as $1 from "./routes/latency-summary.ts";
-import * as $$0 from "./islands/WriteLatencies.tsx";
+import * as $0 from "./routes/count-measurements.ts";
+import * as $1 from "./routes/index.tsx";
+import * as $2 from "./routes/latency-summary.ts";
+import * as $$0 from "./islands/CurrentRequest.tsx";
+import * as $$1 from "./islands/ReadWriteLatencies.tsx";
 
 const manifest = {
   routes: {
-    "./routes/index.tsx": $0,
-    "./routes/latency-summary.ts": $1,
+    "./routes/count-measurements.ts": $0,
+    "./routes/index.tsx": $1,
+    "./routes/latency-summary.ts": $2,
   },
   islands: {
-    "./islands/WriteLatencies.tsx": $$0,
+    "./islands/CurrentRequest.tsx": $$0,
+    "./islands/ReadWriteLatencies.tsx": $$1,
   },
   baseUrl: import.meta.url,
   config,

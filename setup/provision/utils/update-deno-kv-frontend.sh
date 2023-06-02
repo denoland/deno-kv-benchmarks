@@ -44,6 +44,8 @@ update_frontend_config() (
   backend_firestore_svc_url=${backend_firestore_svc_url%\"}/top-10\"
   backend_cloudflarekv_svc_url=${backend_cloudflarekv_svc_url%\"}/top-10\"
 
+  # TODO: Rewrite this to build the JSON with a single `jq` invocation
+  # instead of this flimsy Bash stuff...
   local config_file_contents
   read -r -d '' config_file_contents <<CONFIG
 {
