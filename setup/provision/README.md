@@ -79,6 +79,16 @@ they're shared with Terraform.
  - `TF_VAR_UPSTASH_REDIS_HOST`
  - `TF_VAR_UPSTASH_REDIS_PASSWORD`
 
+## Deployment
+After all of the environment variables listed in
+[required environment variables](#required-environment-variables)
+are available, and all of the prerequisites are satisfied, you can
+deploy the infrastructure with
+```bash
+terraform apply
+```
+and typing `yes` at the prompt and pressing enter.
+
 <!-- Links -->
 [GCP service account key]: https://cloud.google.com/iam/docs/keys-create-delete#creating
 [Upstash Redis]: https://upstash.com/redis
