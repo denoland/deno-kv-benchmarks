@@ -20,3 +20,9 @@ export type LatencySummaryResponse = {
   currentRequestLatencies: Record<string, LatencyOnlyResponse>;
   percentileData: QuantileCalculations;
 }
+
+export type CachedLatencyResponse = {
+  time: number;
+  is_updating: boolean;
+  response: LatencyOnlyResponse;
+};

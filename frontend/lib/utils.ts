@@ -7,8 +7,7 @@ const services = [
   "upstashredis",
   "dynamodb",
   "firestore",
-  // TODO: UNCOMMENT THIS FOR CLOUDFLARE KV TO WORK
-  // "cloudflarekv",
+  "cloudflarekv",
 ] as const;
 
 const percentiles = ["50", "99", "99.9"] as const;
@@ -16,8 +15,14 @@ const numberPercentiles = percentiles.map(Number);
 
 export type Percentiles = (typeof percentiles)[number];
 export type QuantileCalculations = {
-  [measurementReadKey]: Record<string, Record<Percentiles, number>>;
-  [measurementWriteKey]: Record<string, Record<Percentiles, number>>;
+  calculations: {
+    [measurementReadKey]: Record<string, Record<Percentiles, number>>;
+    [measurementWriteKey]: Record<string, Record<Percentiles, number>>;
+  };
+  samples: {
+    [measurementReadKey]: Record<string, number>;
+    [measurementWriteKey]: Record<string, number>;
+  };
 };
 
 export async function quantile(db: Deno.Kv): Promise<QuantileCalculations> {
@@ -34,7 +39,7 @@ export async function quantile(db: Deno.Kv): Promise<QuantileCalculations> {
     [measurementWriteKey]: {} as Record<string, Record<Percentiles, number>>,
   };
 
-  for await (const entry of db.list({ prefix: [measurementKey] }, { limit: maxDataPoints })) {
+  for await (const entry of db.list({ prefix: [measurementKey] }, { limit: maxDataPoints, reverse: true })) {
     const [, readWrite, _time, service] = entry.key;
     measurements[readWrite as typeof measurementReadKey][service as string] ??= [];
     measurements[readWrite as typeof measurementReadKey][service as string].push(entry.value as number);
@@ -52,7 +57,19 @@ export async function quantile(db: Deno.Kv): Promise<QuantileCalculations> {
     }
   }
 
-  return measurementPercentiles;
+  const sampleSizes = {
+    [measurementReadKey]: Object.fromEntries(
+      Object.entries(measurements[measurementReadKey]).map(([key, value]) => [key, value.length])
+    ),
+    [measurementWriteKey]: Object.fromEntries(
+      Object.entries(measurements[measurementWriteKey]).map(([key, value]) => [key, value.length])
+    ),
+  };
+
+  return {
+    calculations: measurementPercentiles,
+    samples: sampleSizes,
+  };
 }
 
 export function capitalize(str: string): string {

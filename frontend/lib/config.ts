@@ -2,12 +2,20 @@ import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/m
 
 const configFile = "config.json";
 const configPath = join(dirname(fromFileUrl(import.meta.url)), configFile);
+const ratelimits: Config["backend_service_ratelimit"] = {
+  denokv: 15e3,
+  upstashredis: 15e3,
+  dynamodb: 15e3,
+  firestore: 15e3,
+  cloudflarekv: 65e3, // 1 minute, due to limitations wrt using CF KV for this benchmark
+};
 
 async function getConfig(): Promise<Config> {
+  const config: Config = { backend_service_ratelimit: ratelimits };
   try {
-    return JSON.parse(await Deno.readTextFile(configPath));
+    return Object.assign(config, JSON.parse(await Deno.readTextFile(configPath)));
   } catch (_error) {
-    return {};
+    return config;
   }
 }
 
@@ -20,6 +28,16 @@ export type Config = {
     dynamodb: string;
     firestore: string;
     cloudflarekv: string;
+  };
+  /**
+   * Rate limits measured in milliseconds
+   */
+  backend_service_ratelimit: {
+    denokv: number;
+    upstashredis: number;
+    dynamodb: number;
+    firestore: number;
+    cloudflarekv: number;
   };
 };
 

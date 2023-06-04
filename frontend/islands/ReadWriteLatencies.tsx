@@ -32,20 +32,26 @@ export default function LatencyChart(props: LatencyChartProps) {
       <LoadingText>Loading {props.operation} latency data...</LoadingText>
     );
   }
+  const latencyMeasurements = latencyDataResponse.percentileData.calculations;
+  const sampleSizes = latencyDataResponse.percentileData.samples[props.operation];
 
   const data: number[] = [];
   const labels: string[] = [];
+  const samples: number[] = [];
 
-  const serviceMeasurements = Object.entries(latencyDataResponse.percentileData[props.operation]);
+  const serviceMeasurements = Object.entries(latencyMeasurements[props.operation]);
   for (const [service, measurements] of serviceMeasurements) {
     data.push(Math.floor(measurements[props.percentile]));
-    labels.push(prettyServiceNames[service as keyof typeof prettyServiceNames]);
+    const label = prettyServiceNames[service as keyof typeof prettyServiceNames];
+    labels.push(label + (service === "cloudflarekv" ? " *" : ""));
+    samples.push(sampleSizes[service]);
   }
 
   const chartData = {
     name: `${capitalize(props.operation)} Latency`,
     data,
     labels,
+    samples,
   };
 
   if (!data.length) {
@@ -67,10 +73,11 @@ export default function LatencyChart(props: LatencyChartProps) {
           __html: `
             (() => {
               const deserialized = JSON.parse(document.getElementById("${id}-data").text);
+              const { samples } = deserialized;
               new ApexCharts(document.getElementById("${id}"), {
                 chart: {
                   // height: 320,
-                  height: 220,
+                  height: 260,
                   type: "bar",
                   // toolbar: {
                   //   show: true,
@@ -113,6 +120,11 @@ export default function LatencyChart(props: LatencyChartProps) {
                   },
                   tooltip: {
                     enabled: false,
+                  },
+                },
+                tooltip: {
+                  y: {
+                    formatter: (value, ctx) => \`\${value}ms (\${samples[ctx.dataPointIndex]} samples)\`,
                   },
                 },
               }).render();
