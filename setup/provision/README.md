@@ -9,7 +9,8 @@ Terraform is treated as the source of truth and everything else,
 scripts, services, etc, all refer to Terraform's state to
 provision and configure things.
 
-## Tools used to test this Terraform code
+## Tools required to deploy the Terraform code
+You **must** have the following list of tools installed.
 
 | Name | Version |
 | ---- | ------- |
@@ -60,9 +61,9 @@ run if the source file (`services/cloudflare-workers-kv/src/index.ts`)
 hasn't been updated since the last time `wrangler` was run.
 
 ## Required environment variables
-These environment variables are required to be set when
+These environment variables **must** be set when
 running terraform and the scripts that provision and
-populate the lambda/cloud functions.
+populate the lambda/cloud functions/deno deploy code.
 
 Some of the variables are prefixed with `TF_VAR_` to ensure that
 they're shared with Terraform.
