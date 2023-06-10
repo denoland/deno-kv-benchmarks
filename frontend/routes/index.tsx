@@ -135,7 +135,7 @@ export default function Home() {
               <ReadWriteLatencies percentile="99.9" operation="write" />
             </div>
 
-            <p class="mt-5 text-sm text-gray-400">
+            <p class="mt-5 text-sm text-gray-400 px-5 md:px-0">
               {"* "}
               {"Due to Cloudflare KV's heavy caching and eventual consistency, it isn't well suited for this test at lower intervals."}
               {" In this test Cloudflare KV is cached with a longer expiration time than the other services, which causes the smaller sample sizes."}
