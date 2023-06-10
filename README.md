@@ -34,6 +34,17 @@ serverless function in the same AWS region as the respective database.
 5. View the frontend by visiting the link output by the deployment
    script.
 
+## Developing the frontend
+The frontend requires `frontend/lib/config.json` to be present for its
+backend endpoint in order to invoke the various services. To create
+the JSON file you must build out the infrastructure as outlined in the
+[provision README], then you can run
+```bash
+./setup/provision/utils/update-deno-kv-frontend.sh
+```
+which will create the `config.json` from the Terraform state file
+and required environment variables.
+
 <!-- Links -->
 [Deno KV]: https://deno.com/kv
 [Upstash Redis]: https://upstash.com/redis
