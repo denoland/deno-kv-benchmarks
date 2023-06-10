@@ -93,7 +93,7 @@ export default function Home() {
               Current Request
               <span class="text-opacity-75">
                 <span class="hidden xl:inline">{" "}→</span>
-                <span class="hidden sm:inline xl:hidden relative top-0.5">{" "}↴</span>
+                <span class="hidden md:inline xl:hidden relative top-0.5">{" "}↴</span>
               </span>
             </span>
           </h2>
