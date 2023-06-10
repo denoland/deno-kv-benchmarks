@@ -84,6 +84,26 @@ export default function LatencyChart(props: LatencyChartProps) {
                   // },
                   animations: { enabled: false },
                 },
+                plotOptions: {
+                  bar: {
+                    horizontal: false,
+                  },
+                },
+                responsive: [
+                  {
+                    breakpoint: 1024,
+                    options: {
+                      chart: {
+                        height: 340,
+                      },
+                      plotOptions: {
+                        bar: {
+                          horizontal: true,
+                        },
+                      },
+                    },
+                  },
+                ],
                 series: [{
                   name: deserialized.name,
                   data: deserialized.data,
@@ -109,7 +129,10 @@ export default function LatencyChart(props: LatencyChartProps) {
                 },
                 yaxis: {
                   labels: {
-                    formatter: (value) => value + "ms",
+                    // ctx is present when formatting category titles
+                    // in horizontal bar mode, and we don't format those
+                    // since we only want to format the numbers
+                    formatter: (value, ctx) => value + (ctx ? "" : "ms"),
                   },
                 },
                 xaxis: {

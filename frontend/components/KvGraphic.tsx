@@ -2,7 +2,7 @@ import { JSX } from "preact";
 
 export function KVGraphic() {
   return (
-    <svg viewBox="0 0 900 500" height="140" class="ml-[-1.8rem]" style={{filter: "hue-rotate(105deg) brightness(1.15) saturate(1.4)"}}>
+    <svg viewBox="0 0 900 500" height="140" class="md:ml-[-1.8rem]" style={{filter: "hue-rotate(105deg) brightness(1.15) saturate(1.4)"}}>
       <rect fill="#142935" x="-7" y="-5" width="14" height="10" rx="4" ry="4" opacity="0"></rect>
       <rect fill="#142935" x="-5" y="-3" width="10" height="6" rx="4" ry="4" opacity="0"></rect>
       <rect fill="#142935" x="14.428571428571427" y="-5" width="14" height="10" rx="4" ry="4" opacity="0"></rect>

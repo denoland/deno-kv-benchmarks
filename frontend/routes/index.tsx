@@ -15,7 +15,7 @@ function Link({ children, url }: { children: ComponentChildren; url: string; }) 
 
 function PercentileHeader({ children }: { children: ComponentChildren; }) {
   return (
-    <h3 class="text-xl mt-6 mb-3 ml-2 text-blue-500 font-bold">
+    <h3 class="text-base lg:text-xl mt-2 lg:mt-6 mb-3 ml-2 pl-5 lg:pl0 text-blue-500 font-bold">
       — {children}
     </h3>
   );
@@ -34,6 +34,26 @@ export default function Home() {
     }
   `;
 
+  // This is a hack to put these styles end of the
+  // page just to increase their specificity due to
+  // some odd bug in twind or Fresh that doesn't
+  // include them
+  const endPageStyles = String.raw`
+    @media (min-width: 768px) {
+      .md\:flex {
+        display: flex;
+      }
+
+      .md\:hidden {
+        display: none;
+      }
+
+      .md\:text-center {
+        text-align: center;
+      }
+    }
+  `;
+
   return (
     <>
       <Head>
@@ -44,14 +64,14 @@ export default function Home() {
       </Head>
       <main class="flex flex-col w-full">
         <header class="bg-gray-900 flex flex-row justify-center py-5">
-          <div class="flex flex-row justify-start text-white max-w-screen-xl w-full">
+          <div class="flex flex-col md:flex-row pt-2 md:pt-0 justify-start text-white max-w-screen-xl w-full">
             <KVGraphic />
-            <h1 class="text-center text-4xl font-thin -ml-8 self-center">
+            <h1 class="text-center text-3xl md:text-4xl px-2 md:px-0 font-thin md:-ml-8 mt-4 mb-4 md:my-0 self-center">
               Deno KV Live Latency Comparison
             </h1>
           </div>
         </header>
-        <div class="max-w-screen-xl text-xl w-full mx-auto mt-10 py-10 px-10 bg-gray-500 text-white">
+        <div class="max-w-screen-xl text-xl w-full mx-auto mt-0 md:mt-10 py-5 md:py-10 px-5 md:px-10 bg-gray-500 text-white">
           <p>
             There are five databases tested here: <Link url="https://deno.com/kv">Deno KV</Link>,{" "}
             <Link url="https://upstash.com/redis">Upstash Redis</Link>,{" "}
@@ -67,45 +87,51 @@ export default function Home() {
             field.
           </p>
         </div>
-        <div class="max-w-screen-xl w-full mx-auto mt-10 h-full flex flex-row text-white">
-          <h2 class="py-5 pl-10 pr-7 text-xl bg-gray-800 whitespace-nowrap">Current Request ➝</h2>
-          <div class="w-full flex flex-row items-center justify-center bg-gray-400">
-            <CurrentRequest />
-          </div>
+        <div class="max-w-screen-xl w-full mx-auto mt-0 md:mt-10 h-full flex flex-col xl:flex-row text-white">
+          <h2 class="py-5 flex flex-row justify-center md:justify-start items-center sm:text-left pl-5 md:pl-10 lg:pr-7 text-xl bg-gray-800 whitespace-nowrap">
+            <span>
+              Current Request
+              <span class="text-opacity-75">
+                <span class="hidden xl:inline">{" "}→</span>
+                <span class="hidden sm:inline xl:hidden relative top-0.5">{" "}↴</span>
+              </span>
+            </span>
+          </h2>
+          <CurrentRequest />
         </div>
-        <div class="max-w-screen-xl w-full mx-auto h-full py-10 mb-10 px-10 bg-gray-100">
+        <div class="max-w-screen-xl w-full mx-auto h-full py-5 md:py-10 mb-0 md:mb-10 px-0 lg:px-5 md:px-10 bg-gray-100">
           <div class="text-xl">
-            <h2 class="text-3xl">Read Latency</h2>
+            <h2 class="text-2xl lg:text-3xl pl-5 lg:pl0">Read Latency</h2>
 
             <PercentileHeader>50th percentile</PercentileHeader>
-            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="50" operation="read" />
             </div>
 
             <PercentileHeader>99th percentile</PercentileHeader>
-            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="99" operation="read" />
             </div>
 
             <PercentileHeader>99.9th percentile</PercentileHeader>
-            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="99.9" operation="read" />
             </div>
 
-            <h2 class="text-3xl mt-10">Write Latency</h2>
+            <h2 class="text-2xl lg:text-3xl mt-10 pl-5 lg:pl0">Write Latency</h2>
 
             <PercentileHeader>50th percentile</PercentileHeader>
-            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="50" operation="write" />
             </div>
 
             <PercentileHeader>99th percentile</PercentileHeader>
-            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="99" operation="write" />
             </div>
 
             <PercentileHeader>99.9th percentile</PercentileHeader>
-            <div class="border-2 border-gray-200 rounded-lg bg-white p-5">
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="99.9" operation="write" />
             </div>
 
@@ -117,6 +143,7 @@ export default function Home() {
           </div>
         </div>
       </main>
+      <style>{endPageStyles}</style>
     </>
   );
 }
