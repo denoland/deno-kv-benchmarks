@@ -19,7 +19,7 @@ export type LatencyOnlyResponse = Omit<LatencyResponse, "records">;
 export type LatencySummaryResponse = {
   currentRequestLatencies: Record<string, LatencyOnlyResponse>;
   percentileData: QuantileCalculations;
-}
+};
 
 export type CachedLatencyResponse = {
   time: number;

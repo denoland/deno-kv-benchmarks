@@ -17,11 +17,16 @@ type GithubRepoRecord = {
   full_name: string;
 };
 
-const client = new Redis(`redis://default:${UPSTASH_REDIS_PASSWORD}@${UPSTASH_REDIS_HOST}`);
+const client = new Redis(
+  `redis://default:${UPSTASH_REDIS_PASSWORD}@${UPSTASH_REDIS_HOST}`,
+);
 
-export async function handler(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
+export async function handler(
+  event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> {
   const { headers } = event;
-  const isValidSecret = headers[DENO_KV_FRONTEND_SECRET_HEADER] === DENO_KV_FRONTEND_SECRET;
+  const isValidSecret =
+    headers[DENO_KV_FRONTEND_SECRET_HEADER] === DENO_KV_FRONTEND_SECRET;
   if (!isValidSecret) {
     return {
       statusCode: 400,
@@ -31,20 +36,27 @@ export async function handler(event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   const readStart = performance.now();
   const recordsJson = await client.zrevrange(sortedSetKey, 0, 9);
-  const records: GithubRepoRecord[] = recordsJson.map((recordJson) => JSON.parse(recordJson));
+  const records: GithubRepoRecord[] = recordsJson.map((recordJson) =>
+    JSON.parse(recordJson)
+  );
   const readLatency = performance.now() - readStart;
 
   const writeStart = performance.now();
   const updatedRecords: (string | number)[] = [];
   for (const record of records) {
-    const newForksCount = Math.floor(Math.random() * maxWrittenForksCount * Math.random());
-    updatedRecords.push(newForksCount, JSON.stringify({
-      ...record,
-      forks_count: newForksCount,
-    }));
+    const newForksCount = Math.floor(
+      Math.random() * maxWrittenForksCount * Math.random(),
+    );
+    updatedRecords.push(
+      newForksCount,
+      JSON.stringify({
+        ...record,
+        forks_count: newForksCount,
+      }),
+    );
   }
   await Promise.all([
-    client.zrem(sortedSetKey, ...recordsJson),    // Remove older records
+    client.zrem(sortedSetKey, ...recordsJson), // Remove older records
     client.zadd(sortedSetKey, ...updatedRecords), // Insert new updated records
   ]);
   const writeLatency = performance.now() - writeStart;

@@ -1,4 +1,4 @@
-import { DynamoDB, QueryInput, AttributeValue } from "@aws-sdk/client-dynamodb";
+import { AttributeValue, DynamoDB, QueryInput } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { APIGatewayEvent, APIGatewayProxyResult } from "aws-lambda";
 
@@ -33,7 +33,7 @@ async function getTopN(
     },
   };
   let lastKey: {
-    ExclusiveStartKey: Record<string, AttributeValue>
+    ExclusiveStartKey: Record<string, AttributeValue>;
   } = { ExclusiveStartKey: {} };
   let documentIds: unknown[] = [];
 
@@ -56,7 +56,9 @@ async function getTopN(
     .Responses![tableName]
     .map((record) => unmarshall(record));
 
-  return (documents as GithubRepoRecord[]).sort((a, b) => b.forks_count - a.forks_count);
+  return (documents as GithubRepoRecord[]).sort((a, b) =>
+    b.forks_count - a.forks_count
+  );
 }
 
 const db = new DynamoDB({});
@@ -67,9 +69,12 @@ type GithubRepoRecord = {
   full_name: string;
 };
 
-export async function handler(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
+export async function handler(
+  event: APIGatewayEvent,
+): Promise<APIGatewayProxyResult> {
   const { headers } = event;
-  const isValidSecret = headers[DENO_KV_FRONTEND_SECRET_HEADER] === DENO_KV_FRONTEND_SECRET;
+  const isValidSecret =
+    headers[DENO_KV_FRONTEND_SECRET_HEADER] === DENO_KV_FRONTEND_SECRET;
   if (!isValidSecret) {
     return {
       statusCode: 400,
@@ -89,7 +94,9 @@ export async function handler(event: APIGatewayEvent): Promise<APIGatewayProxyRe
   const writeStart = performance.now();
   const recordsToWrite: Record<string, AttributeValue>[] = [];
   for (const record of records) {
-    const newForksCount = Math.floor(Math.random() * maxWrittenForksCount * Math.random());
+    const newForksCount = Math.floor(
+      Math.random() * maxWrittenForksCount * Math.random(),
+    );
     recordsToWrite.push(marshall({
       ...record,
       forks_count: newForksCount,
@@ -108,13 +115,17 @@ export async function handler(event: APIGatewayEvent): Promise<APIGatewayProxyRe
 
   return {
     statusCode: 200,
-    body: JSON.stringify({
-      latencies: {
-        read: readLatency,
-        write: writeLatency,
+    body: JSON.stringify(
+      {
+        latencies: {
+          read: readLatency,
+          write: writeLatency,
+        },
+        records,
       },
-      records,
-    }, null, 2),
+      null,
+      2,
+    ),
     headers: {
       "content-type": "application/json",
     },

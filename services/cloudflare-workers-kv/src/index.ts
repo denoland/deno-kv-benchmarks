@@ -21,19 +21,23 @@ function generateKey(record: GithubRepoRecord) {
   const forksCount = String(record.forks_count).padStart(6, "0");
   let forksCountReversed = "";
   for (const char of forksCount) {
-      // Reverse the digits
-      const oldCharCodePoint = char.codePointAt(0)!;
-      const newCharCodePoint = charPoint0 + (charPoint9 - oldCharCodePoint);
-      forksCountReversed += String.fromCodePoint(newCharCodePoint);
+    // Reverse the digits
+    const oldCharCodePoint = char.codePointAt(0)!;
+    const newCharCodePoint = charPoint0 + (charPoint9 - oldCharCodePoint);
+    forksCountReversed += String.fromCodePoint(newCharCodePoint);
   }
   const recordId = String(record.id).padStart(12, "0");
   return `${keyPrefix}${forksCountReversed}:${recordId}` as const;
 }
 
-type KvDbKeyMetadata = { createdAt: string; };
+type KvDbKeyMetadata = { createdAt: string };
 type KvDbKey = KVNamespaceListKey<KvDbKeyMetadata, string>;
 
-async function listTopN(prefix: string, count: number, db: KVNamespace): Promise<{ keys: KvDbKey[] }> {
+async function listTopN(
+  prefix: string,
+  count: number,
+  db: KVNamespace,
+): Promise<{ keys: KvDbKey[] }> {
   const keys: KvDbKey[] = [];
   let cursor = "";
 
@@ -89,7 +93,9 @@ export default {
     env: Env,
     _ctx: ExecutionContext,
   ): Promise<Response> {
-    const isValidSecret = request.headers.get(env.DENO_KV_FRONTEND_SECRET_HEADER) === env.DENO_KV_FRONTEND_SECRET;
+    const isValidSecret =
+      request.headers.get(env.DENO_KV_FRONTEND_SECRET_HEADER) ===
+        env.DENO_KV_FRONTEND_SECRET;
     const isValidPath = new URL(request.url).pathname === "/top-10";
     if (!(isValidSecret && isValidPath)) {
       return new Response("", {
@@ -103,7 +109,8 @@ export default {
     const keyResponse = await listTopN(keyPrefix, topTenSize, db);
     const valuePromises = keyResponse.keys.map(async (key) => {
       const now = new Date().getTime();
-      const delayedReadTimestamp = new Date(key.metadata?.createdAt!).getTime() + newValueRetrievalDelayMs;
+      const delayedReadTimestamp =
+        new Date(key.metadata?.createdAt!).getTime() + newValueRetrievalDelayMs;
       let value: string | null = null;
 
       // You can't request newly created keys on CF KV too quickly
@@ -136,23 +143,29 @@ export default {
     });
     const valuesJson = await Promise.all(valuePromises);
     const readDeserializeStart = performance.now();
-    const values: GithubRepoRecord[] = valuesJson.map((json) => JSON.parse(json!));
+    const values: GithubRepoRecord[] = valuesJson.map((json) =>
+      JSON.parse(json!)
+    );
     readLatency += performance.now() - readDeserializeStart;
 
     const writeStart = performance.now();
     const updatePromises: Promise<void>[] = [];
     for (const record of values) {
       // Double random just to increase the "randomness" a bit more
-      const newForksCount = Math.floor(Math.random() * maxWrittenForksCount * Math.random());
+      const newForksCount = Math.floor(
+        Math.random() * maxWrittenForksCount * Math.random(),
+      );
       const newRecord: GithubRepoRecord = {
         ...record,
         forks_count: newForksCount,
       };
-      updatePromises.push(db.put(generateKey(newRecord), JSON.stringify(newRecord), {
-        metadata: {
-          createdAt: new Date().toJSON(),
-        },
-      }));
+      updatePromises.push(
+        db.put(generateKey(newRecord), JSON.stringify(newRecord), {
+          metadata: {
+            createdAt: new Date().toJSON(),
+          },
+        }),
+      );
     }
     const deletePromises = keyResponse.keys.map((key) => db.delete(key.name));
     await Promise.all(updatePromises.concat(deletePromises));
@@ -171,5 +184,5 @@ export default {
         "content-type": "application/json",
       },
     });
-  }
-}
+  },
+};

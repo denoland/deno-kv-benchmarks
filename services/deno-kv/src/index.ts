@@ -20,7 +20,10 @@ const router = new Router();
 // FIXME: This should probably still add the routes maybe? Not sure
 if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
   router.post("/records", async ({ request, response }) => {
-    if (request.headers.get(DENO_KV_FRONTEND_SECRET_HEADER) !== DENO_KV_FRONTEND_SECRET) {
+    if (
+      request.headers.get(DENO_KV_FRONTEND_SECRET_HEADER) !==
+        DENO_KV_FRONTEND_SECRET
+    ) {
       response.status = 400;
       return;
     }
@@ -49,7 +52,10 @@ if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
   });
 
   router.get("/count", async ({ request, response }) => {
-    if (request.headers.get(DENO_KV_FRONTEND_SECRET_HEADER) !== DENO_KV_FRONTEND_SECRET) {
+    if (
+      request.headers.get(DENO_KV_FRONTEND_SECRET_HEADER) !==
+        DENO_KV_FRONTEND_SECRET
+    ) {
       response.status = 400;
       return;
     }
@@ -64,14 +70,22 @@ if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
   });
 
   router.get("/top-10", async ({ request, response }) => {
-    if (request.headers.get(DENO_KV_FRONTEND_SECRET_HEADER) !== DENO_KV_FRONTEND_SECRET) {
+    if (
+      request.headers.get(DENO_KV_FRONTEND_SECRET_HEADER) !==
+        DENO_KV_FRONTEND_SECRET
+    ) {
       response.status = 400;
       return;
     }
 
     const readStart = performance.now();
     const records: GithubRepoRecord[] = [];
-    for await (const entry of db.list({ prefix: [keyPrefix] }, { limit: 10, reverse: true })) {
+    for await (
+      const entry of db.list({ prefix: [keyPrefix] }, {
+        limit: 10,
+        reverse: true,
+      })
+    ) {
       records.push(entry.value as GithubRepoRecord);
     }
     const readLatency = performance.now() - readStart;
@@ -81,7 +95,9 @@ if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
     const deleteAtomic = db.atomic();
     for (const record of records) {
       // Double random just to increase the "randomness" a bit more
-      const newForksCount = Math.floor(Math.random() * maxWrittenForksCount * Math.random());
+      const newForksCount = Math.floor(
+        Math.random() * maxWrittenForksCount * Math.random(),
+      );
       updatedRecords.push({
         ...record,
         forks_count: newForksCount,
@@ -91,7 +107,10 @@ if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
 
     const insertAtomic = db.atomic();
     for (const updatedRecord of updatedRecords) {
-      insertAtomic.set([keyPrefix, updatedRecord.forks_count, updatedRecord.id], updatedRecord);
+      insertAtomic.set(
+        [keyPrefix, updatedRecord.forks_count, updatedRecord.id],
+        updatedRecord,
+      );
     }
     await Promise.all([
       deleteAtomic.commit(),

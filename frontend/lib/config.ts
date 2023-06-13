@@ -1,4 +1,8 @@
-import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/mod.ts";
+import {
+  dirname,
+  fromFileUrl,
+  join,
+} from "https://deno.land/std@0.187.0/path/mod.ts";
 
 const configFile = "config.json";
 const configPath = join(dirname(fromFileUrl(import.meta.url)), configFile);
@@ -13,7 +17,10 @@ const ratelimits: Config["backend_service_ratelimit"] = {
 async function getConfig(): Promise<Config> {
   const config: Config = { backend_service_ratelimit: ratelimits };
   try {
-    return Object.assign(config, JSON.parse(await Deno.readTextFile(configPath)));
+    return Object.assign(
+      config,
+      JSON.parse(await Deno.readTextFile(configPath)),
+    );
   } catch (_error) {
     return config;
   }

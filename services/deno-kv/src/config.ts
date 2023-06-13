@@ -1,4 +1,8 @@
-import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/mod.ts";
+import {
+  dirname,
+  fromFileUrl,
+  join,
+} from "https://deno.land/std@0.187.0/path/mod.ts";
 
 const configFile = "config.json";
 const configPath = join(dirname(fromFileUrl(import.meta.url)), configFile);

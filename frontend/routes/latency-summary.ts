@@ -1,7 +1,17 @@
 import { HandlerContext, Handlers } from "$fresh/server.ts";
 import { config } from "../lib/config.ts";
-import { LatencySummaryResponse, LatencyResponse, LatencyOnlyResponse, CachedLatencyResponse } from "../lib/types.ts";
-import { measurementKey, measurementReadKey, measurementWriteKey, cachedRequestKey } from "../lib/constants.ts";
+import {
+  CachedLatencyResponse,
+  LatencyOnlyResponse,
+  LatencyResponse,
+  LatencySummaryResponse,
+} from "../lib/types.ts";
+import {
+  cachedRequestKey,
+  measurementKey,
+  measurementReadKey,
+  measurementWriteKey,
+} from "../lib/constants.ts";
 import { quantile } from "../lib/utils.ts";
 import type { Config } from "../lib/config.ts";
 
@@ -15,7 +25,8 @@ function delay(duration: number) {
 function checkStaleCache(service: string, time: number | null) {
   const now = new Date().getTime();
   let nextRequestTime = time;
-  nextRequestTime &&= nextRequestTime + config.backend_service_ratelimit[service as ServiceName];
+  nextRequestTime &&= nextRequestTime +
+    config.backend_service_ratelimit[service as ServiceName];
 
   return !(nextRequestTime && nextRequestTime > now);
 }
@@ -44,7 +55,8 @@ async function setNewCachedResponse(
   while (true) {
     if (!checkStaleCache(service, serviceCachedResponse.value?.time ?? null)) {
       // TODO: Maybe remove or add to actual contract
-      ((serviceCachedResponse.value?.response || {}) as Record<string, unknown>).cached = true;
+      ((serviceCachedResponse.value?.response || {}) as Record<string, unknown>)
+        .cached = true;
       return serviceCachedResponse.value!;
     }
 
@@ -53,11 +65,18 @@ async function setNewCachedResponse(
       // Wait for whoever is in control of this service to update the cache with
       // a new response
       await delay(serviceWaitIsUpdatingDelayMs);
-      const newServiceCachedResponse = await db.get<CachedLatencyResponse>(serviceCachedKey);
+      const newServiceCachedResponse = await db.get<CachedLatencyResponse>(
+        serviceCachedKey,
+      );
 
-      if (!checkStaleCache(service, newServiceCachedResponse.value?.time ?? null)) {
+      if (
+        !checkStaleCache(service, newServiceCachedResponse.value?.time ?? null)
+      ) {
         // TODO: Maybe remove or add to actual contract
-        ((newServiceCachedResponse.value?.response || {}) as Record<string, unknown>).cached = true;
+        ((newServiceCachedResponse.value?.response || {}) as Record<
+          string,
+          unknown
+        >).cached = true;
         return newServiceCachedResponse.value!;
       }
 
@@ -68,7 +87,10 @@ async function setNewCachedResponse(
 
     const atomicLock = db
       .atomic()
-      .check({ key: serviceCachedKey, versionstamp: serviceCachedResponse.versionstamp })
+      .check({
+        key: serviceCachedKey,
+        versionstamp: serviceCachedResponse.versionstamp,
+      })
       .set(serviceCachedKey, {
         time: serviceCachedResponse.value?.time || now,
         is_updating: true,
@@ -83,7 +105,8 @@ async function setNewCachedResponse(
           [secretHeader]: secret,
         },
       });
-      const { records: _, ...latencyData }: LatencyResponse = await response.json();
+      const { records: _, ...latencyData }: LatencyResponse = await response
+        .json();
 
       // TODO: Maybe remove or add to actual contract
       (latencyData as Record<string, unknown>).cached = false;
@@ -97,8 +120,14 @@ async function setNewCachedResponse(
       const finalResult = await db
         .atomic()
         .check({ key: serviceCachedKey, versionstamp: result.versionstamp })
-        .set([measurementKey, measurementReadKey, queryTime, service], latencyData.latencies.read)
-        .set([measurementKey, measurementWriteKey, queryTime, service], latencyData.latencies.write)
+        .set(
+          [measurementKey, measurementReadKey, queryTime, service],
+          latencyData.latencies.read,
+        )
+        .set(
+          [measurementKey, measurementWriteKey, queryTime, service],
+          latencyData.latencies.write,
+        )
         .set(serviceCachedKey, cachedLatencyResponse)
         .commit();
 
@@ -107,7 +136,9 @@ async function setNewCachedResponse(
       }
     }
 
-    serviceCachedResponse = await db.get<CachedLatencyResponse>(serviceCachedKey);
+    serviceCachedResponse = await db.get<CachedLatencyResponse>(
+      serviceCachedKey,
+    );
   }
 }
 
@@ -123,7 +154,9 @@ export const handler: Handlers = {
       .entries(config.backend_service_urls || {})
       .map(async ([service, url]) => {
         const cachedResponseKey = [cachedRequestKey, service];
-        const cachedResponse = await db.get<CachedLatencyResponse>(cachedResponseKey);
+        const cachedResponse = await db.get<CachedLatencyResponse>(
+          cachedResponseKey,
+        );
 
         if (!checkStaleCache(service, cachedResponse.value?.time ?? null)) {
           // TODO: Maybe remove or add to actual contract
@@ -144,7 +177,9 @@ export const handler: Handlers = {
         return [service, newCachedResponse.response] as ServiceLatencyData;
       });
 
-    const latencyData: Record<string, LatencyOnlyResponse> = Object.fromEntries(await Promise.all(latencyDataRequests));
+    const latencyData: Record<string, LatencyOnlyResponse> = Object.fromEntries(
+      await Promise.all(latencyDataRequests),
+    );
 
     const quantileData = await quantile(db);
     const responseData: LatencySummaryResponse = {

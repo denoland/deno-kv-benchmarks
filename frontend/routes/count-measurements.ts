@@ -1,5 +1,9 @@
 import { HandlerContext, Handlers } from "$fresh/server.ts";
-import { measurementKey, measurementReadKey, measurementWriteKey } from "../lib/constants.ts";
+import {
+  measurementKey,
+  measurementReadKey,
+  measurementWriteKey,
+} from "../lib/constants.ts";
 
 const db = await Deno.openKv();
 
@@ -22,5 +26,5 @@ export const handler: Handlers = {
         "Content-Type": "application/json",
       },
     });
-  }
-}
+  },
+};

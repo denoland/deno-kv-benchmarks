@@ -1,5 +1,9 @@
 import { quantileSorted } from "https://esm.sh/d3-array@3.2.4";
-import { measurementKey, measurementReadKey, measurementWriteKey } from "./constants.ts";
+import {
+  measurementKey,
+  measurementReadKey,
+  measurementWriteKey,
+} from "./constants.ts";
 
 const maxDataPointsPerService = 10_000;
 const services = [
@@ -39,10 +43,17 @@ export async function quantile(db: Deno.Kv): Promise<QuantileCalculations> {
     [measurementWriteKey]: {} as Record<string, Record<Percentiles, number>>,
   };
 
-  for await (const entry of db.list({ prefix: [measurementKey] }, { limit: maxDataPoints, reverse: true })) {
+  for await (
+    const entry of db.list({ prefix: [measurementKey] }, {
+      limit: maxDataPoints,
+      reverse: true,
+    })
+  ) {
     const [, readWrite, _time, service] = entry.key;
-    measurements[readWrite as typeof measurementReadKey][service as string] ??= [];
-    measurements[readWrite as typeof measurementReadKey][service as string].push(entry.value as number);
+    measurements[readWrite as typeof measurementReadKey][service as string] ??=
+      [];
+    measurements[readWrite as typeof measurementReadKey][service as string]
+      .push(entry.value as number);
   }
 
   for (const operation of [measurementReadKey, measurementWriteKey] as const) {
@@ -52,17 +63,24 @@ export async function quantile(db: Deno.Kv): Promise<QuantileCalculations> {
       measurementPercentiles[operation][service] ??= percentileValues;
       for (const percentile of numberPercentiles) {
         const sorted = latencyMeasurements.slice().sort((a, b) => a - b);
-        percentileValues[String(percentile)] = quantileSorted(sorted, percentile / 100)!;
+        percentileValues[String(percentile)] = quantileSorted(
+          sorted,
+          percentile / 100,
+        )!;
       }
     }
   }
 
   const sampleSizes = {
     [measurementReadKey]: Object.fromEntries(
-      Object.entries(measurements[measurementReadKey]).map(([key, value]) => [key, value.length])
+      Object.entries(measurements[measurementReadKey]).map((
+        [key, value],
+      ) => [key, value.length]),
     ),
     [measurementWriteKey]: Object.fromEntries(
-      Object.entries(measurements[measurementWriteKey]).map(([key, value]) => [key, value.length])
+      Object.entries(measurements[measurementWriteKey]).map((
+        [key, value],
+      ) => [key, value.length]),
     ),
   };
 

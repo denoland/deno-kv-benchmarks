@@ -2,7 +2,11 @@
 // to facilitate a way to manage the CF worker as part
 // of the Terraform resource lifecycle.
 import { readAll } from "https://deno.land/std@0.187.0/streams/read_all.ts";
-import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/mod.ts";
+import {
+  dirname,
+  fromFileUrl,
+  join,
+} from "https://deno.land/std@0.187.0/path/mod.ts";
 import { encode } from "https://deno.land/std@0.187.0/encoding/hex.ts";
 
 const currentWorkingDirPath = dirname(fromFileUrl(import.meta.url));
@@ -14,17 +18,28 @@ type CfDeployentState = {
   account_id?: string;
 };
 
-const cfWorkerWranglerConfigFilePath = join(currentWorkingDirPath, "../cf-wrangler.toml");
-const cfWorkerDeploymentStateFilePath = join(currentWorkingDirPath, "../cf-worker.state.json");
+const cfWorkerWranglerConfigFilePath = join(
+  currentWorkingDirPath,
+  "../cf-wrangler.toml",
+);
+const cfWorkerDeploymentStateFilePath = join(
+  currentWorkingDirPath,
+  "../cf-worker.state.json",
+);
 const cfWorkerDeploymentStateJson = await Deno
   .readTextFile(cfWorkerDeploymentStateFilePath)
   .catch(() => "{}");
-const cfWorkerDeploymentState: CfDeployentState = JSON.parse(cfWorkerDeploymentStateJson);
-const cfWranglerOutputFilePath = join(currentWorkingDirPath, "../cf-wrangler.log");
+const cfWorkerDeploymentState: CfDeployentState = JSON.parse(
+  cfWorkerDeploymentStateJson,
+);
+const cfWranglerOutputFilePath = join(
+  currentWorkingDirPath,
+  "../cf-wrangler.log",
+);
 
 type RunCommandArgs = {
   environment?: Record<string, string>;
-}
+};
 
 async function runCommand(
   args: string[],
@@ -56,9 +71,13 @@ async function main() {
   const parsedInput = parseJson(inputJson, null);
 
   if (!parsedInput) {
-    console.log(JSON.stringify({
-      error: "invalid input. This must be invoked by `terraform apply`",
-    }, null, 2));
+    console.log(JSON.stringify(
+      {
+        error: "invalid input. This must be invoked by `terraform apply`",
+      },
+      null,
+      2,
+    ));
     Deno.exit(1);
   }
 
@@ -73,8 +92,13 @@ async function main() {
   } = parsedInput as Record<string, string>;
 
   const sourceCode = await Deno.readTextFile(cf_worker_script_file_path);
-  const sourceCodeDigest = await crypto.subtle.digest("SHA-256", encoder.encode(sourceCode));
-  const sourceCodeDigestHex = decoder.decode(encode(new Uint8Array(sourceCodeDigest)));
+  const sourceCodeDigest = await crypto.subtle.digest(
+    "SHA-256",
+    encoder.encode(sourceCode),
+  );
+  const sourceCodeDigestHex = decoder.decode(
+    encode(new Uint8Array(sourceCodeDigest)),
+  );
 
   const tomlKvBindingJson = JSON.stringify(cf_worker_kv_namespace_name);
   const tomlKvIdJson = JSON.stringify(cf_worker_kv_namespace_id);
@@ -93,7 +117,10 @@ async function main() {
 
   let workerUrl = cfWorkerDeploymentState.worker_url;
 
-  if (!workerUrl || sourceCodeDigestHex !== cfWorkerDeploymentState.deployed_sha256) {
+  if (
+    !workerUrl ||
+    sourceCodeDigestHex !== cfWorkerDeploymentState.deployed_sha256
+  ) {
     const newState: CfDeployentState = {
       deployed_sha256: sourceCodeDigestHex,
       worker_url: workerUrl,
@@ -103,11 +130,15 @@ async function main() {
     const wranglerOutput = await runCommand([
       "wrangler",
       "deploy",
-      "-c", cfWorkerWranglerConfigFilePath,
-      "--var", `KV_NAMESPACE_NAME:${cf_worker_kv_namespace_name}`,
-      "--var", `DENO_KV_FRONTEND_SECRET:${service_secret}`,
-      "--var", `DENO_KV_FRONTEND_SECRET_HEADER:${service_secret_header}`,
-      cf_worker_script_file_path
+      "-c",
+      cfWorkerWranglerConfigFilePath,
+      "--var",
+      `KV_NAMESPACE_NAME:${cf_worker_kv_namespace_name}`,
+      "--var",
+      `DENO_KV_FRONTEND_SECRET:${service_secret}`,
+      "--var",
+      `DENO_KV_FRONTEND_SECRET_HEADER:${service_secret_header}`,
+      cf_worker_script_file_path,
     ], {
       environment: {
         ...denoEnv,
@@ -120,26 +151,23 @@ async function main() {
     const wranglerStderr = decoder.decode(wranglerOutput.stderr);
     const logOutput = `[${
       new Date().toJSON()
-    }] Wrangler Deployment\nExit code: ${
-      wranglerOutput.code
-    }\nSHA256: ${
-      sourceCodeDigestHex
-    }\nAccountId: ${
-      cf_account_id
-    }\nstdout:\n${
-      wranglerStdout
-    }\nstderr:\n${
-      wranglerStderr
-    }\n\n`;
+    }] Wrangler Deployment\nExit code: ${wranglerOutput.code}\nSHA256: ${sourceCodeDigestHex}\nAccountId: ${cf_account_id}\nstdout:\n${wranglerStdout}\nstderr:\n${wranglerStderr}\n\n`;
 
-    const printedWranglerUrl = wranglerStdout.match(/https:\/\/[^\s]+\.workers\.dev/)?.[0];
+    const printedWranglerUrl = wranglerStdout.match(
+      /https:\/\/[^\s]+\.workers\.dev/,
+    )?.[0];
     if (printedWranglerUrl) {
       newState.worker_url = printedWranglerUrl;
       workerUrl = printedWranglerUrl;
     }
 
-    await Deno.writeTextFile(cfWranglerOutputFilePath, logOutput, { append: true });
-    await Deno.writeTextFile(cfWorkerDeploymentStateFilePath, JSON.stringify(newState, null, 2));
+    await Deno.writeTextFile(cfWranglerOutputFilePath, logOutput, {
+      append: true,
+    });
+    await Deno.writeTextFile(
+      cfWorkerDeploymentStateFilePath,
+      JSON.stringify(newState, null, 2),
+    );
   }
 
   const terraformOutput = {

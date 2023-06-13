@@ -23,8 +23,12 @@ type GithubRepoRecord = {
   full_name: string;
 };
 
-const dataset: GithubRepoRecord[] = JSON.parse(Deno.readTextFileSync("../github-repo-dataset.json"));
-const client = new Redis(`redis://default:${UPSTASH_REDIS_PASSWORD}@${UPSTASH_REDIS_HOST}`);
+const dataset: GithubRepoRecord[] = JSON.parse(
+  Deno.readTextFileSync("../github-repo-dataset.json"),
+);
+const client = new Redis(
+  `redis://default:${UPSTASH_REDIS_PASSWORD}@${UPSTASH_REDIS_HOST}`,
+);
 const sortedSetKey = "gh_forks_count";
 
 // There's no record with a forks_count over this number
@@ -41,11 +45,14 @@ for (const item of dataset) {
 
       inserted++;
       if (inserted === dataset.length) {
-        const reportedCount = await client.zcount(sortedSetKey, 0, maxForksCount);
+        const reportedCount = await client.zcount(
+          sortedSetKey,
+          0,
+          maxForksCount,
+        );
         console.log(`Inserted count: ${inserted}`);
         console.log(`Reported count: ${reportedCount}`);
         client.disconnect();
       }
     });
 }
-

@@ -1,4 +1,8 @@
-import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/mod.ts";
+import {
+  dirname,
+  fromFileUrl,
+  join,
+} from "https://deno.land/std@0.187.0/path/mod.ts";
 
 const denoDeployProjectEnv = "DENO_DEPLOY_BACKEND_PROJECT";
 const batchMacroInsertSize = 500;
@@ -24,7 +28,9 @@ type GithubRepoRecord = {
   full_name: string;
 };
 
-const datasetFilepath = Deno.readTextFileSync(join(currentWorkingDir, "../github-repo-dataset.json"));
+const datasetFilepath = Deno.readTextFileSync(
+  join(currentWorkingDir, "../github-repo-dataset.json"),
+);
 const dataset: GithubRepoRecord[] = JSON.parse(datasetFilepath);
 
 type CountEndpointResponse = {

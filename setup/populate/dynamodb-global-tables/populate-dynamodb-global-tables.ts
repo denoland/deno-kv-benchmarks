@@ -1,6 +1,14 @@
 import { ApiFactory } from "https://deno.land/x/aws_api@v0.8.1/client/mod.ts";
-import { DynamoDB, ScanInput, AttributeValue } from "https://deno.land/x/aws_api@v0.8.1/services/dynamodb/mod.ts";
-import { fromFileUrl, join, dirname } from "https://deno.land/std@0.187.0/path/mod.ts";
+import {
+  AttributeValue,
+  DynamoDB,
+  ScanInput,
+} from "https://deno.land/x/aws_api@v0.8.1/services/dynamodb/mod.ts";
+import {
+  dirname,
+  fromFileUrl,
+  join,
+} from "https://deno.land/std@0.187.0/path/mod.ts";
 
 const currentWorkingDir = dirname(fromFileUrl(import.meta.url));
 let tableName = "";
@@ -16,7 +24,10 @@ type TerraformState = {
 };
 
 try {
-  const tfstateFilepath = join(currentWorkingDir, "../../provision/terraform.tfstate");
+  const tfstateFilepath = join(
+    currentWorkingDir,
+    "../../provision/terraform.tfstate",
+  );
   const tfstateContents = Deno.readTextFileSync(tfstateFilepath);
   const tfstate: TerraformState = JSON.parse(tfstateContents);
 
@@ -27,7 +38,9 @@ try {
 }
 
 if (!tableName) {
-  console.error("error: failed to get DynamoDB table name from the Terraform .tfstate. Did you run Terraform?");
+  console.error(
+    "error: failed to get DynamoDB table name from the Terraform .tfstate. Did you run Terraform?",
+  );
   Deno.exit(1);
 }
 
@@ -102,13 +115,16 @@ function serialize(data: unknown): SerializedDynamoDbValue | undefined {
   }
 }
 
-async function countDynamoDbRecords(client: DynamoDB, tableName: string): Promise<bigint> {
+async function countDynamoDbRecords(
+  client: DynamoDB,
+  tableName: string,
+): Promise<bigint> {
   const scanParameters: ScanInput = {
     TableName: tableName,
     Select: "COUNT",
   };
   let lastKey: {
-    ExclusiveStartKey: Record<string, AttributeValue | null | undefined>
+    ExclusiveStartKey: Record<string, AttributeValue | null | undefined>;
   } = { ExclusiveStartKey: {} };
   let count = 0n;
 
@@ -130,7 +146,9 @@ type GithubRepoRecord = {
   full_name: string;
 };
 
-const datasetFilepath = Deno.readTextFileSync(join(currentWorkingDir, "../github-repo-dataset.json"));
+const datasetFilepath = Deno.readTextFileSync(
+  join(currentWorkingDir, "../github-repo-dataset.json"),
+);
 const dataset: GithubRepoRecord[] = JSON.parse(datasetFilepath);
 const client = new ApiFactory().makeNew(DynamoDB);
 

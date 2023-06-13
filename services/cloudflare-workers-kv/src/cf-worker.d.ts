@@ -55,7 +55,8 @@ declare type WorkerGlobalScopeEventMap = {
   unhandledrejection: PromiseRejectionEvent;
   rejectionhandled: PromiseRejectionEvent;
 };
-declare abstract class WorkerGlobalScope extends EventTarget<WorkerGlobalScopeEventMap> {
+declare abstract class WorkerGlobalScope
+  extends EventTarget<WorkerGlobalScopeEventMap> {
   EventTarget: typeof EventTarget;
 }
 declare interface Console {
@@ -180,7 +181,7 @@ declare interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
   structuredClone<T>(value: T, options?: StructuredSerializeOptions): T;
   fetch(
     input: RequestInfo,
-    init?: RequestInit<RequestInitCfProperties>
+    init?: RequestInit<RequestInitCfProperties>,
   ): Promise<Response>;
   self: ServiceWorkerGlobalScope;
   crypto: Crypto;
@@ -237,24 +238,24 @@ declare interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
 declare function addEventListener<Type extends keyof WorkerGlobalScopeEventMap>(
   type: Type,
   handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>,
-  options?: EventTargetAddEventListenerOptions | boolean
+  options?: EventTargetAddEventListenerOptions | boolean,
 ): void;
 declare function removeEventListener<
-  Type extends keyof WorkerGlobalScopeEventMap
+  Type extends keyof WorkerGlobalScopeEventMap,
 >(
   type: Type,
   handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>,
-  options?: EventTargetEventListenerOptions | boolean
+  options?: EventTargetEventListenerOptions | boolean,
 ): void;
 /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
 declare function dispatchEvent(
-  event: WorkerGlobalScopeEventMap[keyof WorkerGlobalScopeEventMap]
+  event: WorkerGlobalScopeEventMap[keyof WorkerGlobalScopeEventMap],
 ): boolean;
 declare function btoa(data: string): string;
 declare function atob(data: string): string;
 declare function setTimeout(
   callback: (...args: any[]) => void,
-  msDelay?: number
+  msDelay?: number,
 ): number;
 declare function setTimeout<Args extends any[]>(
   callback: (...args: Args) => void,
@@ -264,7 +265,7 @@ declare function setTimeout<Args extends any[]>(
 declare function clearTimeout(timeoutId: number | null): void;
 declare function setInterval(
   callback: (...args: any[]) => void,
-  msDelay?: number
+  msDelay?: number,
 ): number;
 declare function setInterval<Args extends any[]>(
   callback: (...args: Args) => void,
@@ -275,11 +276,11 @@ declare function clearInterval(timeoutId: number | null): void;
 declare function queueMicrotask(task: Function): void;
 declare function structuredClone<T>(
   value: T,
-  options?: StructuredSerializeOptions
+  options?: StructuredSerializeOptions,
 ): T;
 declare function fetch(
   input: RequestInfo,
-  init?: RequestInit<RequestInitCfProperties>
+  init?: RequestInit<RequestInitCfProperties>,
 ): Promise<Response>;
 declare const self: ServiceWorkerGlobalScope;
 declare const crypto: Crypto;
@@ -294,41 +295,41 @@ declare interface ExecutionContext {
 }
 declare type ExportedHandlerFetchHandler<
   Env = unknown,
-  CfHostMetadata = unknown
+  CfHostMetadata = unknown,
 > = (
   request: Request<CfHostMetadata, IncomingRequestCfProperties<CfHostMetadata>>,
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => Response | Promise<Response>;
 declare type ExportedHandlerTailHandler<Env = unknown> = (
   events: TraceItem[],
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => void | Promise<void>;
 declare type ExportedHandlerTraceHandler<Env = unknown> = (
   traces: TraceItem[],
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => void | Promise<void>;
 declare type ExportedHandlerScheduledHandler<Env = unknown> = (
   controller: ScheduledController,
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => void | Promise<void>;
 declare type ExportedHandlerQueueHandler<Env = unknown, Message = unknown> = (
   batch: MessageBatch<Message>,
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => void | Promise<void>;
 declare type ExportedHandlerTestHandler<Env = unknown> = (
   controller: TestController,
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => void | Promise<void>;
 declare interface ExportedHandler<
   Env = unknown,
   QueueMessage = unknown,
-  CfHostMetadata = unknown
+  CfHostMetadata = unknown,
 > {
   fetch?: ExportedHandlerFetchHandler<Env, CfHostMetadata>;
   tail?: ExportedHandlerTailHandler<Env>;
@@ -364,13 +365,13 @@ declare interface DurableObjectId {
 }
 declare interface DurableObjectNamespace {
   newUniqueId(
-    options?: DurableObjectNamespaceNewUniqueIdOptions
+    options?: DurableObjectNamespaceNewUniqueIdOptions,
   ): DurableObjectId;
   idFromName(name: string): DurableObjectId;
   idFromString(id: string): DurableObjectId;
   get(
     id: DurableObjectId,
-    options?: DurableObjectNamespaceGetDurableObjectOptions
+    options?: DurableObjectNamespaceGetDurableObjectOptions,
   ): DurableObjectStub;
   jurisdiction(jurisdiction: DurableObjectJurisdiction): DurableObjectNamespace;
 }
@@ -402,23 +403,23 @@ declare interface DurableObjectState {
 declare interface DurableObjectTransaction {
   get<T = unknown>(
     key: string,
-    options?: DurableObjectGetOptions
+    options?: DurableObjectGetOptions,
   ): Promise<T | undefined>;
   get<T = unknown>(
     keys: string[],
-    options?: DurableObjectGetOptions
+    options?: DurableObjectGetOptions,
   ): Promise<Map<string, T>>;
   list<T = unknown>(
-    options?: DurableObjectListOptions
+    options?: DurableObjectListOptions,
   ): Promise<Map<string, T>>;
   put<T>(
     key: string,
     value: T,
-    options?: DurableObjectPutOptions
+    options?: DurableObjectPutOptions,
   ): Promise<void>;
   put<T>(
     entries: Record<string, T>,
-    options?: DurableObjectPutOptions
+    options?: DurableObjectPutOptions,
   ): Promise<void>;
   delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
   delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>;
@@ -426,41 +427,41 @@ declare interface DurableObjectTransaction {
   getAlarm(options?: DurableObjectGetAlarmOptions): Promise<number | null>;
   setAlarm(
     scheduledTime: number | Date,
-    options?: DurableObjectSetAlarmOptions
+    options?: DurableObjectSetAlarmOptions,
   ): Promise<void>;
   deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>;
 }
 declare interface DurableObjectStorage {
   get<T = unknown>(
     key: string,
-    options?: DurableObjectGetOptions
+    options?: DurableObjectGetOptions,
   ): Promise<T | undefined>;
   get<T = unknown>(
     keys: string[],
-    options?: DurableObjectGetOptions
+    options?: DurableObjectGetOptions,
   ): Promise<Map<string, T>>;
   list<T = unknown>(
-    options?: DurableObjectListOptions
+    options?: DurableObjectListOptions,
   ): Promise<Map<string, T>>;
   put<T>(
     key: string,
     value: T,
-    options?: DurableObjectPutOptions
+    options?: DurableObjectPutOptions,
   ): Promise<void>;
   put<T>(
     entries: Record<string, T>,
-    options?: DurableObjectPutOptions
+    options?: DurableObjectPutOptions,
   ): Promise<void>;
   delete(key: string, options?: DurableObjectPutOptions): Promise<boolean>;
   delete(keys: string[], options?: DurableObjectPutOptions): Promise<number>;
   deleteAll(options?: DurableObjectPutOptions): Promise<void>;
   transaction<T>(
-    closure: (txn: DurableObjectTransaction) => Promise<T>
+    closure: (txn: DurableObjectTransaction) => Promise<T>,
   ): Promise<T>;
   getAlarm(options?: DurableObjectGetAlarmOptions): Promise<number | null>;
   setAlarm(
     scheduledTime: number | Date,
-    options?: DurableObjectSetAlarmOptions
+    options?: DurableObjectSetAlarmOptions,
   ): Promise<void>;
   deleteAlarm(options?: DurableObjectSetAlarmOptions): Promise<void>;
   sync(): Promise<void>;
@@ -539,27 +540,27 @@ declare interface EventInit {
   composed?: boolean;
 }
 declare type EventListener<EventType extends Event = Event> = (
-  event: EventType
+  event: EventType,
 ) => void;
 declare interface EventListenerObject<EventType extends Event = Event> {
   handleEvent(event: EventType): void;
 }
 declare type EventListenerOrEventListenerObject<
-  EventType extends Event = Event
+  EventType extends Event = Event,
 > = EventListener<EventType> | EventListenerObject<EventType>;
 declare class EventTarget<
-  EventMap extends Record<string, Event> = Record<string, Event>
+  EventMap extends Record<string, Event> = Record<string, Event>,
 > {
   constructor();
   addEventListener<Type extends keyof EventMap>(
     type: Type,
     handler: EventListenerOrEventListenerObject<EventMap[Type]>,
-    options?: EventTargetAddEventListenerOptions | boolean
+    options?: EventTargetAddEventListenerOptions | boolean,
   ): void;
   removeEventListener<Type extends keyof EventMap>(
     type: Type,
     handler: EventListenerOrEventListenerObject<EventMap[Type]>,
-    options?: EventTargetEventListenerOptions | boolean
+    options?: EventTargetEventListenerOptions | boolean,
   ): void;
   dispatchEvent(event: EventMap[keyof EventMap]): boolean;
 }
@@ -602,7 +603,7 @@ declare abstract class ExtendableEvent extends Event {
 declare class Blob {
   constructor(
     bits?: ((ArrayBuffer | ArrayBufferView) | string | Blob)[],
-    options?: BlobOptions
+    options?: BlobOptions,
   );
   readonly size: number;
   readonly type: string;
@@ -618,7 +619,7 @@ declare class File extends Blob {
   constructor(
     bits: ((ArrayBuffer | ArrayBufferView) | string | Blob)[] | undefined,
     name: string,
-    options?: FileOptions
+    options?: FileOptions,
   );
   readonly name: string;
   readonly lastModified: number;
@@ -635,7 +636,7 @@ declare abstract class Cache {
   delete(request: RequestInfo, options?: CacheQueryOptions): Promise<boolean>;
   match(
     request: RequestInfo,
-    options?: CacheQueryOptions
+    options?: CacheQueryOptions,
   ): Promise<Response | undefined>;
   put(request: RequestInfo, response: Response): Promise<void>;
 }
@@ -654,7 +655,7 @@ declare abstract class Crypto {
       | Int32Array
       | Uint32Array
       | BigInt64Array
-      | BigUint64Array
+      | BigUint64Array,
   >(buffer: T): T;
   randomUUID(): string;
   DigestStream: typeof DigestStream;
@@ -663,58 +664,58 @@ declare abstract class SubtleCrypto {
   encrypt(
     algorithm: string | SubtleCryptoEncryptAlgorithm,
     key: CryptoKey,
-    plainText: ArrayBuffer | ArrayBufferView
+    plainText: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   decrypt(
     algorithm: string | SubtleCryptoEncryptAlgorithm,
     key: CryptoKey,
-    cipherText: ArrayBuffer | ArrayBufferView
+    cipherText: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   sign(
     algorithm: string | SubtleCryptoSignAlgorithm,
     key: CryptoKey,
-    data: ArrayBuffer | ArrayBufferView
+    data: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   verify(
     algorithm: string | SubtleCryptoSignAlgorithm,
     key: CryptoKey,
     signature: ArrayBuffer | ArrayBufferView,
-    data: ArrayBuffer | ArrayBufferView
+    data: ArrayBuffer | ArrayBufferView,
   ): Promise<boolean>;
   digest(
     algorithm: string | SubtleCryptoHashAlgorithm,
-    data: ArrayBuffer | ArrayBufferView
+    data: ArrayBuffer | ArrayBufferView,
   ): Promise<ArrayBuffer>;
   generateKey(
     algorithm: string | SubtleCryptoGenerateKeyAlgorithm,
     extractable: boolean,
-    keyUsages: string[]
+    keyUsages: string[],
   ): Promise<CryptoKey | CryptoKeyPair>;
   deriveKey(
     algorithm: string | SubtleCryptoDeriveKeyAlgorithm,
     baseKey: CryptoKey,
     derivedKeyAlgorithm: string | SubtleCryptoImportKeyAlgorithm,
     extractable: boolean,
-    keyUsages: string[]
+    keyUsages: string[],
   ): Promise<CryptoKey>;
   deriveBits(
     algorithm: string | SubtleCryptoDeriveKeyAlgorithm,
     baseKey: CryptoKey,
-    length: number | null
+    length: number | null,
   ): Promise<ArrayBuffer>;
   importKey(
     format: string,
     keyData: (ArrayBuffer | ArrayBufferView) | JsonWebKey,
     algorithm: string | SubtleCryptoImportKeyAlgorithm,
     extractable: boolean,
-    keyUsages: string[]
+    keyUsages: string[],
   ): Promise<CryptoKey>;
   exportKey(format: string, key: CryptoKey): Promise<ArrayBuffer | JsonWebKey>;
   wrapKey(
     format: string,
     key: CryptoKey,
     wrappingKey: CryptoKey,
-    wrapAlgorithm: string | SubtleCryptoEncryptAlgorithm
+    wrapAlgorithm: string | SubtleCryptoEncryptAlgorithm,
   ): Promise<ArrayBuffer>;
   unwrapKey(
     format: string,
@@ -723,11 +724,11 @@ declare abstract class SubtleCrypto {
     unwrapAlgorithm: string | SubtleCryptoEncryptAlgorithm,
     unwrappedKeyAlgorithm: string | SubtleCryptoImportKeyAlgorithm,
     extractable: boolean,
-    keyUsages: string[]
+    keyUsages: string[],
   ): Promise<CryptoKey>;
   timingSafeEqual(
     a: ArrayBuffer | ArrayBufferView,
-    b: ArrayBuffer | ArrayBufferView
+    b: ArrayBuffer | ArrayBufferView,
   ): boolean;
 }
 declare abstract class CryptoKey {
@@ -850,7 +851,7 @@ declare class TextDecoder {
   constructor(decoder?: string, options?: TextDecoderConstructorOptions);
   decode(
     input?: ArrayBuffer | ArrayBufferView,
-    options?: TextDecoderDecodeOptions
+    options?: TextDecoderDecodeOptions,
   ): string;
   readonly encoding: string;
   readonly fatal: boolean;
@@ -891,9 +892,9 @@ declare class FormData {
       this: This,
       value: string,
       key: string,
-      parent: FormData
+      parent: FormData,
     ) => void,
-    thisArg?: This
+    thisArg?: This,
   ): void;
   [Symbol.iterator](): IterableIterator<[key: string, value: string]>;
 }
@@ -904,7 +905,7 @@ declare class HTMLRewriter {
   constructor();
   on(
     selector: string,
-    handlers: HTMLRewriterElementContentHandlers
+    handlers: HTMLRewriterElementContentHandlers,
   ): HTMLRewriter;
   onDocument(handlers: HTMLRewriterDocumentContentHandlers): HTMLRewriter;
   transform(response: Response): Response;
@@ -989,7 +990,7 @@ declare class Headers {
   delete(name: string): void;
   forEach<This = unknown>(
     callback: (this: This, value: string, key: string, parent: Headers) => void,
-    thisArg?: This
+    thisArg?: This,
   ): void;
   entries(): IterableIterator<[key: string, value: string]>;
   keys(): IterableIterator<string>;
@@ -1037,11 +1038,11 @@ declare interface ResponseInit {
 }
 declare type RequestInfo<
   CfHostMetadata = unknown,
-  Cf = CfProperties<CfHostMetadata>
+  Cf = CfProperties<CfHostMetadata>,
 > = Request<CfHostMetadata, Cf> | string | URL;
 declare class Request<
   CfHostMetadata = unknown,
-  Cf = CfProperties<CfHostMetadata>
+  Cf = CfProperties<CfHostMetadata>,
 > extends Body {
   constructor(input: RequestInfo<CfProperties>, init?: RequestInit<Cf>);
   clone(): Request<CfHostMetadata, Cf>;
@@ -1093,85 +1094,85 @@ declare interface KVNamespaceListKey<Metadata, Key extends string = string> {
 }
 declare type KVNamespaceListResult<Metadata, Key extends string = string> =
   | {
-      list_complete: false;
-      keys: KVNamespaceListKey<Metadata, Key>[];
-      cursor: string;
-    }
+    list_complete: false;
+    keys: KVNamespaceListKey<Metadata, Key>[];
+    cursor: string;
+  }
   | {
-      list_complete: true;
-      keys: KVNamespaceListKey<Metadata, Key>[];
-    };
+    list_complete: true;
+    keys: KVNamespaceListKey<Metadata, Key>[];
+  };
 declare interface KVNamespace<Key extends string = string> {
   get(
     key: Key,
-    options?: Partial<KVNamespaceGetOptions<undefined>>
+    options?: Partial<KVNamespaceGetOptions<undefined>>,
   ): Promise<string | null>;
   get(key: Key, type: "text"): Promise<string | null>;
   get<ExpectedValue = unknown>(
     key: Key,
-    type: "json"
+    type: "json",
   ): Promise<ExpectedValue | null>;
   get(key: Key, type: "arrayBuffer"): Promise<ArrayBuffer | null>;
   get(key: Key, type: "stream"): Promise<ReadableStream | null>;
   get(
     key: Key,
-    options?: KVNamespaceGetOptions<"text">
+    options?: KVNamespaceGetOptions<"text">,
   ): Promise<string | null>;
   get<ExpectedValue = unknown>(
     key: Key,
-    options?: KVNamespaceGetOptions<"json">
+    options?: KVNamespaceGetOptions<"json">,
   ): Promise<ExpectedValue | null>;
   get(
     key: Key,
-    options?: KVNamespaceGetOptions<"arrayBuffer">
+    options?: KVNamespaceGetOptions<"arrayBuffer">,
   ): Promise<ArrayBuffer | null>;
   get(
     key: Key,
-    options?: KVNamespaceGetOptions<"stream">
+    options?: KVNamespaceGetOptions<"stream">,
   ): Promise<ReadableStream | null>;
   list<Metadata = unknown>(
-    options?: KVNamespaceListOptions
+    options?: KVNamespaceListOptions,
   ): Promise<KVNamespaceListResult<Metadata, Key>>;
   put(
     key: Key,
     value: string | ArrayBuffer | ArrayBufferView | ReadableStream,
-    options?: KVNamespacePutOptions
+    options?: KVNamespacePutOptions,
   ): Promise<void>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    options?: Partial<KVNamespaceGetOptions<undefined>>
+    options?: Partial<KVNamespaceGetOptions<undefined>>,
   ): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    type: "text"
+    type: "text",
   ): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>;
   getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(
     key: Key,
-    type: "json"
+    type: "json",
   ): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    type: "arrayBuffer"
+    type: "arrayBuffer",
   ): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    type: "stream"
+    type: "stream",
   ): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    options: KVNamespaceGetOptions<"text">
+    options: KVNamespaceGetOptions<"text">,
   ): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>;
   getWithMetadata<ExpectedValue = unknown, Metadata = unknown>(
     key: Key,
-    options: KVNamespaceGetOptions<"json">
+    options: KVNamespaceGetOptions<"json">,
   ): Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    options: KVNamespaceGetOptions<"arrayBuffer">
+    options: KVNamespaceGetOptions<"arrayBuffer">,
   ): Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
   getWithMetadata<Metadata = unknown>(
     key: Key,
-    options: KVNamespaceGetOptions<"stream">
+    options: KVNamespaceGetOptions<"stream">,
   ): Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
   delete(key: Key): Promise<void>;
 }
@@ -1240,7 +1241,7 @@ declare abstract class R2Bucket {
     key: string,
     options: R2GetOptions & {
       onlyIf: R2Conditional | Headers;
-    }
+    },
   ): Promise<R2ObjectBody | R2Object | null>;
   get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>;
   put(
@@ -1252,7 +1253,7 @@ declare abstract class R2Bucket {
       | string
       | null
       | Blob,
-    options?: R2PutOptions
+    options?: R2PutOptions,
   ): Promise<R2Object>;
   put(
     key: string,
@@ -1265,11 +1266,11 @@ declare abstract class R2Bucket {
       | Blob,
     options?: R2PutOptions & {
       onlyIf: R2Conditional | Headers;
-    }
+    },
   ): Promise<R2Object | null>;
   createMultipartUpload(
     key: string,
-    options?: R2MultipartOptions
+    options?: R2MultipartOptions,
   ): Promise<R2MultipartUpload>;
   resumeMultipartUpload(key: string, uploadId: string): R2MultipartUpload;
   delete(keys: string | string[]): Promise<void>;
@@ -1280,7 +1281,7 @@ declare interface R2MultipartUpload {
   readonly uploadId: string;
   uploadPart(
     partNumber: number,
-    value: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob
+    value: ReadableStream | (ArrayBuffer | ArrayBufferView) | string | Blob,
   ): Promise<R2UploadedPart>;
   abort(): Promise<void>;
   complete(uploadedParts: R2UploadedPart[]): Promise<R2Object>;
@@ -1312,16 +1313,16 @@ declare interface R2ObjectBody extends R2Object {
 }
 declare type R2Range =
   | {
-      offset: number;
-      length?: number;
-    }
+    offset: number;
+    length?: number;
+  }
   | {
-      offset?: number;
-      length: number;
-    }
+    offset?: number;
+    length: number;
+  }
   | {
-      suffix: number;
-    };
+    suffix: number;
+  };
 declare interface R2Conditional {
   etagMatches?: string;
   etagDoesNotMatch?: string;
@@ -1370,18 +1371,20 @@ declare interface R2HTTPMetadata {
   cacheControl?: string;
   cacheExpiry?: Date;
 }
-declare type R2Objects = {
-  objects: R2Object[];
-  delimitedPrefixes: string[];
-} & (
-  | {
+declare type R2Objects =
+  & {
+    objects: R2Object[];
+    delimitedPrefixes: string[];
+  }
+  & (
+    | {
       truncated: true;
       cursor: string;
     }
-  | {
+    | {
       truncated: false;
     }
-);
+  );
 declare abstract class ScheduledEvent extends ExtendableEvent {
   readonly scheduledTime: number;
   readonly cron: string;
@@ -1401,7 +1404,7 @@ declare interface UnderlyingSink<W = any> {
   start?: (controller: WritableStreamDefaultController) => void | Promise<void>;
   write?: (
     chunk: W,
-    controller: WritableStreamDefaultController
+    controller: WritableStreamDefaultController,
   ) => void | Promise<void>;
   abort?: (reason: any) => void | Promise<void>;
   close?: () => void | Promise<void>;
@@ -1416,10 +1419,10 @@ declare interface UnderlyingByteSource {
 declare interface UnderlyingSource<R = any> {
   type?: "" | undefined;
   start?: (
-    controller: ReadableStreamDefaultController<R>
+    controller: ReadableStreamDefaultController<R>,
   ) => void | Promise<void>;
   pull?: (
-    controller: ReadableStreamDefaultController<R>
+    controller: ReadableStreamDefaultController<R>,
   ) => void | Promise<void>;
   cancel?: (reason: any) => void | Promise<void>;
 }
@@ -1427,14 +1430,14 @@ declare interface Transformer<I = any, O = any> {
   readableType?: string;
   writableType?: string;
   start?: (
-    controller: TransformStreamDefaultController<O>
+    controller: TransformStreamDefaultController<O>,
   ) => void | Promise<void>;
   transform?: (
     chunk: I,
-    controller: TransformStreamDefaultController<O>
+    controller: TransformStreamDefaultController<O>,
   ) => void | Promise<void>;
   flush?: (
-    controller: TransformStreamDefaultController<O>
+    controller: TransformStreamDefaultController<O>,
   ) => void | Promise<void>;
 }
 declare interface StreamPipeOptions {
@@ -1462,13 +1465,13 @@ declare interface StreamPipeOptions {
 }
 declare type ReadableStreamReadResult<R = any> =
   | {
-      done: false;
-      value: R;
-    }
+    done: false;
+    value: R;
+  }
   | {
-      done: true;
-      value?: undefined;
-    };
+    done: true;
+    value?: undefined;
+  };
 /** This Streams API interface represents a readable stream of byte data. The Fetch API offers a concrete instance of a ReadableStream through the body property of a Response object. */
 declare interface ReadableStream<R = any> {
   readonly locked: boolean;
@@ -1477,27 +1480,27 @@ declare interface ReadableStream<R = any> {
   getReader(options: ReadableStreamGetReaderOptions): ReadableStreamBYOBReader;
   pipeThrough<T>(
     transform: ReadableWritablePair<T, R>,
-    options?: StreamPipeOptions
+    options?: StreamPipeOptions,
   ): ReadableStream<T>;
   pipeTo(
     destination: WritableStream<R>,
-    options?: StreamPipeOptions
+    options?: StreamPipeOptions,
   ): Promise<void>;
   tee(): [ReadableStream<R>, ReadableStream<R>];
   values(options?: ReadableStreamValuesOptions): AsyncIterableIterator<R>;
   [Symbol.asyncIterator](
-    options?: ReadableStreamValuesOptions
+    options?: ReadableStreamValuesOptions,
   ): AsyncIterableIterator<R>;
 }
 declare const ReadableStream: {
   prototype: ReadableStream;
   new (
     underlyingSource: UnderlyingByteSource,
-    strategy?: QueuingStrategy<Uint8Array>
+    strategy?: QueuingStrategy<Uint8Array>,
   ): ReadableStream<Uint8Array>;
   new <R = any>(
     underlyingSource?: UnderlyingSource<R>,
-    strategy?: QueuingStrategy<R>
+    strategy?: QueuingStrategy<R>,
   ): ReadableStream<R>;
 };
 declare class ReadableStreamDefaultReader<R = any> {
@@ -1512,12 +1515,12 @@ declare class ReadableStreamBYOBReader {
   readonly closed: Promise<void>;
   cancel(reason?: any): Promise<void>;
   read<T extends ArrayBufferView>(
-    view: T
+    view: T,
   ): Promise<ReadableStreamReadResult<T>>;
   releaseLock(): void;
   readAtLeast<T extends ArrayBufferView>(
     minElements: number,
-    view: T
+    view: T,
   ): Promise<ReadableStreamReadResult<T>>;
 }
 declare interface ReadableStreamGetReaderOptions {
@@ -1565,7 +1568,7 @@ declare interface ReadableWritablePair<R = any, W = any> {
 declare class WritableStream<W = any> {
   constructor(
     underlyingSink?: UnderlyingSink,
-    queuingStrategy?: QueuingStrategy
+    queuingStrategy?: QueuingStrategy,
   );
   readonly locked: boolean;
   abort(reason?: any): Promise<void>;
@@ -1586,7 +1589,7 @@ declare class TransformStream<I = any, O = any> {
   constructor(
     transformer?: Transformer<I, O>,
     writableStrategy?: QueuingStrategy<I>,
-    readableStrategy?: QueuingStrategy<O>
+    readableStrategy?: QueuingStrategy<O>,
   );
   readonly readable: ReadableStream<O>;
   readonly writable: WritableStream<I>;
@@ -1594,7 +1597,7 @@ declare class TransformStream<I = any, O = any> {
 declare class FixedLengthStream extends IdentityTransformStream {
   constructor(
     expectedLength: number | bigint,
-    queuingStrategy?: IdentityTransformStreamQueuingStrategy
+    queuingStrategy?: IdentityTransformStreamQueuingStrategy,
   );
 }
 declare class IdentityTransformStream extends TransformStream<
@@ -1634,8 +1637,7 @@ declare interface TextDecoderStreamTextDecoderStreamInit {
   fatal?: boolean;
 }
 declare class ByteLengthQueuingStrategy
-  implements QueuingStrategy<ArrayBufferView>
-{
+  implements QueuingStrategy<ArrayBufferView> {
   constructor(init: QueuingStrategyInit);
   get highWaterMark(): number;
   get size(): (chunk?: any) => number;
@@ -1660,13 +1662,13 @@ declare abstract class TailEvent extends ExtendableEvent {
 declare interface TraceItem {
   readonly event:
     | (
-        | TraceItemFetchEventInfo
-        | TraceItemScheduledEventInfo
-        | TraceItemAlarmEventInfo
-        | TraceItemQueueEventInfo
-        | TraceItemEmailEventInfo
-        | TraceItemCustomEventInfo
-      )
+      | TraceItemFetchEventInfo
+      | TraceItemScheduledEventInfo
+      | TraceItemAlarmEventInfo
+      | TraceItemQueueEventInfo
+      | TraceItemEmailEventInfo
+      | TraceItemCustomEventInfo
+    )
     | null;
   readonly eventTimestamp: number | null;
   readonly logs: TraceLog[];
@@ -1747,7 +1749,7 @@ declare class URLSearchParams {
       | URLSearchParams
       | string
       | Record<string, string>
-      | [key: string, value: string][]
+      | [key: string, value: string][],
   );
   get size(): number;
   append(name: string, value: string): void;
@@ -1765,9 +1767,9 @@ declare class URLSearchParams {
       this: This,
       value: string,
       key: string,
-      parent: URLSearchParams
+      parent: URLSearchParams,
     ) => void,
-    thisArg?: This
+    thisArg?: This,
   ): void;
   toString(): string;
   [Symbol.iterator](): IterableIterator<[key: string, value: string]>;
@@ -1785,7 +1787,7 @@ declare class URLPattern {
   test(input?: string | URLPatternURLPatternInit, baseURL?: string): boolean;
   exec(
     input?: string | URLPatternURLPatternInit,
-    baseURL?: string
+    baseURL?: string,
   ): URLPatternURLPatternResult | null;
 }
 declare interface URLPatternURLPatternInit {
@@ -2149,16 +2151,16 @@ declare interface RequestInitCfPropertiesImage
    */
   border?:
     | {
-        color: string;
-        width: number;
-      }
+      color: string;
+      width: number;
+    }
     | {
-        color: string;
-        top: number;
-        right: number;
-        bottom: number;
-        left: number;
-      };
+      color: string;
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
+    };
   /**
    * Increase brightness by a factor. A value of 1.0 equals no change, a value
    * of 0.5 equals half brightness, and a value of 2.0 equals twice as bright.
@@ -2195,11 +2197,11 @@ declare interface RequestInitCfPropertiesImageMinify {
  * Request metadata provided by Cloudflare's edge.
  */
 declare type IncomingRequestCfProperties<HostMetadata = unknown> =
-  IncomingRequestCfPropertiesBase &
-    IncomingRequestCfPropertiesBotManagementEnterprise &
-    IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> &
-    IncomingRequestCfPropertiesGeographicInformation &
-    IncomingRequestCfPropertiesCloudflareAccessOrApiShield;
+  & IncomingRequestCfPropertiesBase
+  & IncomingRequestCfPropertiesBotManagementEnterprise
+  & IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>
+  & IncomingRequestCfPropertiesGeographicInformation
+  & IncomingRequestCfPropertiesCloudflareAccessOrApiShield;
 declare interface IncomingRequestCfPropertiesBase
   extends Record<string, unknown> {
   /**
@@ -2242,7 +2244,8 @@ declare interface IncomingRequestCfPropertiesBase
    *
    * @example 3
    */
-  edgeRequestKeepAliveStatus: IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus;
+  edgeRequestKeepAliveStatus:
+    IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus;
   /**
    * The HTTP Protocol the request used.
    *
@@ -2277,7 +2280,8 @@ declare interface IncomingRequestCfPropertiesBase
    *
    * If the incoming request was served over plaintext (without TLS) this field is undefined.
    */
-  tlsExportedAuthenticator?: IncomingRequestCfPropertiesExportedAuthenticatorMetadata;
+  tlsExportedAuthenticator?:
+    IncomingRequestCfPropertiesExportedAuthenticatorMetadata;
 }
 declare interface IncomingRequestCfPropertiesBotManagementBase {
   /**
@@ -2332,7 +2336,7 @@ declare interface IncomingRequestCfPropertiesBotManagementEnterprise
   };
 }
 declare interface IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<
-  HostMetadata
+  HostMetadata,
 > {
   /**
    * Custom metadata set per-host in [Cloudflare for SaaS](https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/).
@@ -2938,7 +2942,7 @@ declare abstract class EmailEvent extends ExtendableEvent {
 declare type EmailExportedHandler<Env = unknown> = (
   message: ForwardableEmailMessage,
   env: Env,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
 ) => void | Promise<void>;
 declare module "cloudflare:email" {
   let _EmailMessage: {
@@ -2966,7 +2970,7 @@ declare type EventContext<Env, P extends string, Data> = {
 declare type PagesFunction<
   Env = unknown,
   Params extends string = any,
-  Data extends Record<string, unknown> = Record<string, unknown>
+  Data extends Record<string, unknown> = Record<string, unknown>,
 > = (context: EventContext<Env, Params, Data>) => Response | Promise<Response>;
 declare type EventPluginContext<Env, P extends string, Data, PluginArgs> = {
   request: Request;
@@ -2987,9 +2991,9 @@ declare type PagesPluginFunction<
   Env = unknown,
   Params extends string = any,
   Data extends Record<string, unknown> = Record<string, unknown>,
-  PluginArgs = unknown
+  PluginArgs = unknown,
 > = (
-  context: EventPluginContext<Env, Params, Data, PluginArgs>
+  context: EventPluginContext<Env, Params, Data, PluginArgs>,
 ) => Response | Promise<Response>;
 declare module "assets:*" {
   // @ts-ignore deno ts
@@ -3038,4 +3042,3 @@ declare interface DispatchNamespace {
    */
   get(name: string): Fetcher;
 }
-
