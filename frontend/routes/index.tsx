@@ -88,7 +88,7 @@ export default function Home() {
           </p>
         </div>
         <div class="max-w-screen-xl w-full mx-auto mt-0 md:mt-10 h-full flex flex-col xl:flex-row text-white">
-          <h2 class="py-5 flex flex-row justify-center md:justify-start items-center sm:text-left pl-5 md:pl-10 lg:pr-7 text-xl bg-gray-800 whitespace-nowrap">
+          <h2 class="py-5 flex flex-row justify-center md:justify-start items-center sm:text-left md:pl-10 lg:pr-7 text-xl bg-gray-800 whitespace-nowrap">
             <span>
               Current Request
               <span class="text-opacity-75">
