@@ -34,6 +34,9 @@ export async function handler(
     };
   }
 
+  // Initial warmup read
+  await client.zrevrange(sortedSetKey, 0, 9);
+
   const readStart = performance.now();
   const recordsJson = await client.zrevrange(sortedSetKey, 0, 9);
   const records: GithubRepoRecord[] = recordsJson.map((recordJson) =>

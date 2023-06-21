@@ -28,6 +28,12 @@ functions.http("denoCloudFn", async (req, res) => {
     return res.status(400).end("");
   }
 
+  // Initial warmup read
+  await collection
+    .orderBy(forksField, "desc")
+    .limit(10)
+    .get();
+
   const readStart = performance.now();
   const documentQuery = await collection
     .orderBy(forksField, "desc")

@@ -82,6 +82,14 @@ export async function handler(
     };
   }
 
+  // Initial warmup read
+  await getTopN(
+    DYNAMODB_TABLE_NAME,
+    DYNAMODB_TABLE_GSI_INDEX,
+    10,
+    db,
+  );
+
   const readStart = performance.now();
   const records = await getTopN(
     DYNAMODB_TABLE_NAME,
