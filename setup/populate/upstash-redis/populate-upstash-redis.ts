@@ -1,3 +1,8 @@
+import {
+  dirname,
+  fromFileUrl,
+  join,
+} from "https://deno.land/std@0.187.0/path/mod.ts";
 import RedisDefault from "npm:ioredis@5.3.2";
 const Redis = RedisDefault.default;
 
@@ -12,6 +17,7 @@ if (requiredEnv.length) {
   Deno.exit(1);
 }
 
+const currentWorkingDir = dirname(fromFileUrl(import.meta.url));
 const {
   TF_VAR_UPSTASH_REDIS_HOST: UPSTASH_REDIS_HOST,
   TF_VAR_UPSTASH_REDIS_PASSWORD: UPSTASH_REDIS_PASSWORD,
@@ -24,7 +30,7 @@ type GithubRepoRecord = {
 };
 
 const dataset: GithubRepoRecord[] = JSON.parse(
-  Deno.readTextFileSync("../github-repo-dataset.json"),
+  Deno.readTextFileSync(join(currentWorkingDir, "../github-repo-dataset.json")),
 );
 const client = new Redis(
   `redis://default:${UPSTASH_REDIS_PASSWORD}@${UPSTASH_REDIS_HOST}`,
