@@ -21,11 +21,6 @@ You **must** have the following list of tools installed.
 | [jq]        | v1.6     |
 | bash        | v5.1.16  |
 
-## Things to consider
-
-This Terraform project assumes that your Cloudflare account only has a single
-account member.
-
 ## Prerequisites
 
 ### Google Cloud Platform
@@ -81,6 +76,7 @@ with Terraform.
 - `AWS_REGION`
 - `GOOGLE_APPLICATION_CREDENTIALS` - pointing to a [GCP service account key]
   JSON file
+- `TF_VAR_CLOUDFLARE_ACCOUNT_ID`
 - `TF_VAR_CLOUDFLARE_API_TOKEN`
 - `TF_VAR_UPSTASH_REDIS_HOST`
 - `TF_VAR_UPSTASH_REDIS_PASSWORD`
