@@ -16,9 +16,47 @@ const svcPopulateEndpoint = "/records";
 const svcCountEndpoint = "/count";
 const svcPopulateUrl = `${svcBaseUrl}${svcPopulateEndpoint}`;
 const svcCountUrl = `${svcBaseUrl}${svcCountEndpoint}`;
+let backendServiceSecret = "";
+let backendServiceSecretHeader = "";
 
 if (!denoDeployProject) {
   console.error(`Missing required env var: ${denoDeployProjectEnv}`);
+  Deno.exit(1);
+}
+
+type TerraformState = {
+  outputs: {
+    [outputName: string]:
+      | { value: string; type: "string" }
+      | { value: number; type: "number" }
+      | { value: boolean; type: "bool" }
+      | { value: Record<string, unknown>; type: "object" };
+  };
+};
+
+try {
+  const tfstateFilepath = join(
+    currentWorkingDir,
+    "../../provision/terraform.tfstate",
+  );
+  const tfstateContents = Deno.readTextFileSync(tfstateFilepath);
+  const tfstate: TerraformState = JSON.parse(tfstateContents);
+
+  const backendServiceSecretOutput = tfstate.outputs.backend_service_secret;
+  const backendServiceSecretHeaderOutput = tfstate.outputs.backend_service_secret_header;
+
+  if (backendServiceSecretOutput.type === "string" && backendServiceSecretHeaderOutput.type === "string") {
+    backendServiceSecret = backendServiceSecretOutput.value;
+    backendServiceSecretHeader = backendServiceSecretHeaderOutput.value;
+  }
+} catch (_error) {
+  // We don't care to handle any specific errors currently
+}
+
+if (!(backendServiceSecret && backendServiceSecretHeader)) {
+  console.error(
+    "error: failed to get backend secret & header from the Terraform .tfstate. Did you run Terraform?",
+  );
   Deno.exit(1);
 }
 
@@ -38,7 +76,11 @@ type CountEndpointResponse = {
 };
 
 async function countRecords() {
-  const response = await fetch(svcCountUrl);
+  const response = await fetch(svcCountUrl, {
+    headers: {
+      [backendServiceSecretHeader]: backendServiceSecret,
+    },
+  });
   const { count } = (await response.json()) as CountEndpointResponse;
   return count;
 }
@@ -48,9 +90,15 @@ async function bulkWrite(records: GithubRepoRecord[][]) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      [backendServiceSecretHeader]: backendServiceSecret,
     },
     body: JSON.stringify(records),
   });
+
+  if (response.status !== 200) {
+    throw new Error(`failed to write records:\nstatus: ${response.status}\nmessage: ${await response.text()}`);
+  }
+
   return await response.json();
 }
 
