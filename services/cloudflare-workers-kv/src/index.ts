@@ -105,6 +105,9 @@ export default {
 
     const db = env[env.KV_NAMESPACE_NAME] as KVNamespace;
 
+    // Initial warmup read
+    await listTopN(keyPrefix, topTenSize, db);
+
     let readLatency = 0;
     const keyResponse = await listTopN(keyPrefix, topTenSize, db);
     const valuePromises = keyResponse.keys.map(async (key) => {

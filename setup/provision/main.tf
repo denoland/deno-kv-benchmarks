@@ -36,7 +36,6 @@ provider "cloudflare" {
 # Declare locals
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
-data "cloudflare_accounts" "current" {}
 
 resource "random_id" "backend_service_secret" {
   byte_length = 32
@@ -50,7 +49,7 @@ locals {
     gcp_project_id                = "deno-cloud-functions"
     gcp_region                    = "us-west1" # Oregon similar to AWS
     gcp_firestore_collection      = "repos"
-    cf_account_id                 = data.cloudflare_accounts.current.accounts[0].id
+    cf_account_id                 = var.CLOUDFLARE_ACCOUNT_ID
     cf_kv_namespace               = "deno_kv_ns_store"
     backend_service_secret        = random_id.backend_service_secret.hex
     backend_service_secret_header = "x-backend-secret"
@@ -86,6 +85,10 @@ variable "UPSTASH_REDIS_HOST" {
 }
 
 variable "UPSTASH_REDIS_PASSWORD" {
+  type = string
+}
+
+variable "CLOUDFLARE_ACCOUNT_ID" {
   type = string
 }
 

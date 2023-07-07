@@ -78,6 +78,14 @@ if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
       return;
     }
 
+    // Initial warmup read
+    for await (
+      const _ of db.list({ prefix: [keyPrefix] }, {
+        limit: 10,
+        reverse: true,
+      })
+    );
+
     const readStart = performance.now();
     const records: GithubRepoRecord[] = [];
     for await (
