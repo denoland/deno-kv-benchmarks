@@ -1,4 +1,6 @@
 # AWS DynamoDB Database
+# This is not a global table, the name is just from an earlier
+# Terraform config revision
 resource "aws_dynamodb_table" "dynamodb_global_table" {
   name             = local.dynamodb_table_name
   billing_mode     = "PAY_PER_REQUEST"
@@ -28,36 +30,6 @@ resource "aws_dynamodb_table" "dynamodb_global_table" {
     hash_key        = "host"
     range_key       = "forks_count"
     projection_type = "KEYS_ONLY"
-  }
-
-  # Global tables. The DB is already provisioned in us-west-2
-  # so it's omitted
-  replica {
-    region_name = "us-east-1"
-  }
-
-  replica {
-    region_name = "us-west-1"
-  }
-
-  replica {
-    region_name = "eu-west-1"
-  }
-
-  replica {
-    region_name = "eu-central-1"
-  }
-
-  replica {
-    region_name = "ap-southeast-1"
-  }
-
-  replica {
-    region_name = "ap-southeast-2"
-  }
-
-  replica {
-    region_name = "sa-east-1"
   }
 }
 

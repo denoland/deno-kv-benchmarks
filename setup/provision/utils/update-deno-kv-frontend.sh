@@ -35,6 +35,7 @@ shopt -s nullglob
 update_frontend_config() (
   local secret=$(jq '.outputs.backend_service_secret.value' < "$terraform_state_file")
   local secret_header=$(jq '.outputs.backend_service_secret_header.value' < "$terraform_state_file")
+  local region_proxy_ip=$(jq '.outputs.gcp_vm_ip.value' < "$terraform_state_file")
   local backend_denokv_svc_url=\"https://$DENO_DEPLOY_BACKEND_PROJECT.deno.dev/top-10\"
   local backend_upstashredis_svc_url=$(jq '.outputs.lambda_invoke_url.value["upstash-redis"]' < "$terraform_state_file")
   local backend_dynamodb_svc_url=$(jq '.outputs.lambda_invoke_url.value["dynamodb-global-tables"]' < "$terraform_state_file")
@@ -51,6 +52,7 @@ update_frontend_config() (
 {
   "DENO_KV_FRONTEND_SECRET": $secret,
   "DENO_KV_FRONTEND_SECRET_HEADER": $secret_header,
+  "region_proxy_ip": $region_proxy_ip,
   "backend_service_urls": {
     "denokv": $backend_denokv_svc_url,
     "upstashredis": $backend_upstashredis_svc_url,

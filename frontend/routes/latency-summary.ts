@@ -14,6 +14,7 @@ import {
 } from "../lib/constants.ts";
 import { quantile } from "../lib/utils.ts";
 import type { Config } from "../lib/config.ts";
+import { makeDenoDeployRequest } from "../lib/deno-kv-backend.ts";
 
 type ServiceName = keyof Config["backend_service_ratelimit"];
 type ServiceLatencyData = [string, LatencyOnlyResponse];
@@ -100,13 +101,22 @@ async function setNewCachedResponse(
 
     if (result.ok) {
       // We've confirmed that we've received control of this service, so we're okay to request now
-      const response = await fetch(serviceUrl, {
-        headers: {
-          [secretHeader]: secret,
-        },
-      });
-      const { records: _, ...latencyData }: LatencyResponse = await response
-        .json();
+      let latencyResponse: LatencyResponse;
+      if (service === "denokv") {
+        // To eliminate network latency when requesting from Deno KV, we request
+        // from a VM running in the same GCP region to ensure that the Deno
+        // Deploy code is run from the same region
+        latencyResponse = JSON.parse(await makeDenoDeployRequest(serviceUrl));
+      } else {
+        const response = await fetch(serviceUrl, {
+          headers: {
+            [secretHeader]: secret,
+          },
+        });
+        latencyResponse = await response.json();
+      }
+
+      const { records: _, ...latencyData } = latencyResponse;
 
       // TODO: Maybe remove or add to actual contract
       (latencyData as Record<string, unknown>).cached = false;
@@ -177,9 +187,20 @@ export const handler: Handlers = {
         return [service, newCachedResponse.response] as ServiceLatencyData;
       });
 
-    const latencyData: Record<string, LatencyOnlyResponse> = Object.fromEntries(
-      await Promise.all(latencyDataRequests),
-    );
+    let latencyData: Record<string, LatencyOnlyResponse>;
+    try {
+      latencyData = Object.fromEntries(
+        await Promise.all(latencyDataRequests),
+      );
+    } catch (error) {
+      console.error("Failed to get latency requests", error);
+      return new Response(
+        JSON.stringify({
+          error: "failed",
+        }),
+        { status: 500 },
+      );
+    }
 
     const quantileData = await quantile(db);
     const responseData: LatencySummaryResponse = {

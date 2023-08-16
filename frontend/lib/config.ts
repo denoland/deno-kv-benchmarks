@@ -29,6 +29,7 @@ async function getConfig(): Promise<Config> {
 export type Config = {
   DENO_KV_FRONTEND_SECRET?: string;
   DENO_KV_FRONTEND_SECRET_HEADER?: string;
+  region_proxy_ip?: string;
   backend_service_urls?: {
     denokv: string;
     upstashredis: string;

@@ -33,6 +33,7 @@ project via the API Library before you can provision the GCP resources:
 - Artifact Registry API
 - Cloud Build API
 - Google Cloud Firestore API
+- Compute Engine API
 
 ### Upstash
 
