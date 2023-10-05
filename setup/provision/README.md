@@ -21,6 +21,12 @@ You **must** have the following list of tools installed.
 | [jq]        | v1.6     |
 | bash        | v5.1.16  |
 
+### Tools used to bundle the code
+
+| Name | Version |
+| ---- | ------- |
+| zip  | v3.0    |
+
 ## Prerequisites
 
 ### Google Cloud Platform
@@ -82,6 +88,14 @@ with Terraform.
 - `TF_VAR_UPSTASH_REDIS_HOST`
 - `TF_VAR_UPSTASH_REDIS_PASSWORD`
 
+## Build artifacts
+
+Build the code bundle artifacts for the different services
+
+```bash
+./utils/bundle.sh
+```
+
 ## Deployment
 
 After all of the environment variables listed in
@@ -94,6 +108,15 @@ terraform apply
 ```
 
 and typing `yes` at the prompt and pressing enter.
+
+### Deploy the Deno frontend and backend
+
+Run the following code
+
+```bash
+./utils/deploy-deno-kv-backend.sh
+./utils/deploy-deno-kv-frontend.sh
+```
 
 <!-- Links -->
 
