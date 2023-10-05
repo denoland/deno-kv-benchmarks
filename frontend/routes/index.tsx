@@ -126,7 +126,7 @@ export default function Home() {
               Check out the source
             </Link>{" "}
             or{" "}
-            <Link url="https://deno.com/blog/deno-kv-benchmarks">
+            <Link url="https://deno.com/blog/comparing-deno-kv">
               read the blog post for more details.
             </Link>
           </p>
