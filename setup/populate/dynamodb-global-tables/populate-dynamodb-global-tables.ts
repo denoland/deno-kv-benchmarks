@@ -10,6 +10,7 @@ import {
   join,
 } from "https://deno.land/std@0.187.0/path/mod.ts";
 
+const batchInsertSize = 25; // Hard limit imposed by DynamoDB's API
 const currentWorkingDir = dirname(fromFileUrl(import.meta.url));
 let tableName = "";
 
@@ -152,19 +153,28 @@ const datasetFilepath = Deno.readTextFileSync(
 const dataset: GithubRepoRecord[] = JSON.parse(datasetFilepath);
 const client = new ApiFactory().makeNew(DynamoDB);
 
-for (const item of dataset) {
-  const serialized = serialize(Object.assign(item, {
-    host: "github",
-  }));
+// Insert in `batchInsertSize` increments
+for (let i = 0; i < dataset.length; i += batchInsertSize) {
+  const batch = dataset
+    .slice(i, i + batchInsertSize)
+    .map((item) => {
+      const serialized = serialize(Object.assign(item, {
+        host: "github",
+      }));
 
-  if (serialized && "M" in serialized) {
-    const rootFields = serialized.M;
-    // TODO: This is very slow, refactor to `batchWriteItem`
-    await client.putItem({
-      TableName: tableName,
-      Item: rootFields,
-    });
-  }
+      return (serialized as { M: Record<string, SerializedDynamoDbValue> }).M;
+    })
+    .map((item) => ({
+      PutRequest: {
+        Item: item as Record<string, SerializedDynamoDbValue>,
+      },
+    }));
+
+  await client.batchWriteItem({
+    RequestItems: {
+      [tableName]: batch,
+    },
+  });
 }
 
 const reportedCount = await countDynamoDbRecords(client, tableName);
