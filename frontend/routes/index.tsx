@@ -154,6 +154,11 @@ export default function Home() {
               <ReadWriteLatencies percentile="50" operation="read" />
             </div>
 
+            <PercentileHeader>90th percentile</PercentileHeader>
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="90" operation="read" />
+            </div>
+
             <PercentileHeader>99th percentile</PercentileHeader>
             <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="99" operation="read" />
@@ -171,6 +176,11 @@ export default function Home() {
             <PercentileHeader>50th percentile</PercentileHeader>
             <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="50" operation="write" />
+            </div>
+
+            <PercentileHeader>90th percentile</PercentileHeader>
+            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
+              <ReadWriteLatencies percentile="90" operation="write" />
             </div>
 
             <PercentileHeader>99th percentile</PercentileHeader>
