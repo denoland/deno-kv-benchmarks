@@ -14,7 +14,7 @@ const services = [
   "cloudflarekv",
 ] as const;
 
-const percentiles = ["50", "90", "99", "99.9"] as const;
+const percentiles = ["50", "90", "99"] as const;
 const numberPercentiles = percentiles.map(Number);
 
 export type Percentiles = (typeof percentiles)[number];

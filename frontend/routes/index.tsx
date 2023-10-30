@@ -164,11 +164,6 @@ export default function Home() {
               <ReadWriteLatencies percentile="99" operation="read" />
             </div>
 
-            <PercentileHeader>99.9th percentile</PercentileHeader>
-            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
-              <ReadWriteLatencies percentile="99.9" operation="read" />
-            </div>
-
             <h2 class="text-2xl lg:text-3xl mt-10 pl-5 lg:pl0">
               Write Latency
             </h2>
@@ -186,11 +181,6 @@ export default function Home() {
             <PercentileHeader>99th percentile</PercentileHeader>
             <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
               <ReadWriteLatencies percentile="99" operation="write" />
-            </div>
-
-            <PercentileHeader>99.9th percentile</PercentileHeader>
-            <div class="border-t-2 border-b-2 md:border-2 border-gray-200 md:rounded-lg bg-white p-5">
-              <ReadWriteLatencies percentile="99.9" operation="write" />
             </div>
 
             <p class="mt-5 text-sm text-gray-400 px-5 md:px-0">
