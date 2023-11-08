@@ -103,9 +103,12 @@ if (DENO_KV_FRONTEND_SECRET && DENO_KV_FRONTEND_SECRET_HEADER) {
     const deleteAtomic = db.atomic();
     for (const record of records) {
       // Double random just to increase the "randomness" a bit more
-      const newForksCount = Math.floor(
-        Math.random() * maxWrittenForksCount * Math.random(),
-      );
+      let newForksCount: number;
+      do {
+        newForksCount = Math.floor(
+          Math.random() * maxWrittenForksCount * Math.random(),
+        );
+      } while (newForksCount === record.forks_count);
       updatedRecords.push({
         ...record,
         forks_count: newForksCount,
