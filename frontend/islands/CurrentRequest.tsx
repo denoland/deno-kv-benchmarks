@@ -1,16 +1,13 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { ComponentChildren } from "preact";
+import { Spinner } from "../components/Spinner.tsx";
 import { latencyData, loadLatencyData } from "../lib/latency-data.ts";
-import {
-  measurementReadKey,
-  measurementWriteKey,
-  prettyServiceNames,
-} from "../lib/constants.ts";
+import { prettyServiceNames } from "../lib/constants.ts";
 
 function LoadingText({ children }: { children: ComponentChildren }) {
   return (
     <span class="py-0 md:py-7" style={{ opacity: 0.5 }}>
-      <em>{children}</em>
+      <em>{children}</em> <Spinner size={22} />
     </span>
   );
 }

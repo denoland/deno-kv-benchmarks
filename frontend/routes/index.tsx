@@ -32,6 +32,27 @@ export default function Home() {
     body {
       margin: 0;
     }
+
+    svg.spinner {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 0.25em;
+      animation: 1.5s linear 0s infinite spinner-spin;
+    }
+
+    svg.spinner path {
+      fill: rgb(255, 255, 255);
+    }
+
+    @keyframes spinner-spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
   `;
 
   // This is a hack to put these styles end of the
