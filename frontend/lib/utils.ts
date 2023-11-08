@@ -1,17 +1,15 @@
 import { quantileSorted } from "https://esm.sh/d3-array@3.2.4";
 import {
-  maxDataPointsPerService,
-  measurementKey,
   measurementReadKey,
   measurementWriteKey,
   serviceOpSortedBatchKey,
 } from "./constants.ts";
 
 const services = [
-  "denokv",
   "upstashredis",
-  "dynamodb",
   "firestore",
+  "dynamodb",
+  "denokv",
   "cloudflarekv",
 ] as const;
 
