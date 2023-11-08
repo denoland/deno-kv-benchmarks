@@ -26,3 +26,9 @@ export type CachedLatencyResponse = {
   is_updating: boolean;
   response: LatencyOnlyResponse;
 };
+
+export type QueueMessage = {
+  nonce: string;
+  serviceOp: string;
+  measurement: number;
+};

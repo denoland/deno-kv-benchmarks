@@ -5,12 +5,11 @@ import {
   LatencyOnlyResponse,
   LatencyResponse,
   LatencySummaryResponse,
+  QueueMessage,
 } from "../lib/types.ts";
 import {
   cachedRequestKey,
-  measurementKey,
-  measurementReadKey,
-  measurementWriteKey,
+  newMeasurementNonceKey,
 } from "../lib/constants.ts";
 import { quantile } from "../lib/utils.ts";
 import type { Config } from "../lib/config.ts";
@@ -24,12 +23,13 @@ function delay(duration: number) {
 }
 
 function checkStaleCache(service: string, time: number | null) {
-  const now = new Date().getTime();
-  let nextRequestTime = time;
-  nextRequestTime &&= nextRequestTime +
-    config.backend_service_ratelimit[service as ServiceName];
+  if (time) {
+    const now = new Date().getTime();
+    const nextRequestTime = time + config.backend_service_ratelimit[service as ServiceName];
+    return nextRequestTime < now;
+  }
 
-  return !(nextRequestTime && nextRequestTime > now);
+  return true;
 }
 
 // We have to wait a while since some services take way too
@@ -50,7 +50,6 @@ async function setNewCachedResponse(
   serviceUrl: string,
   serviceCachedKey: string[],
   serviceCachedResponse: Deno.KvEntryMaybe<CachedLatencyResponse>,
-  queryTime: number,
   db: Deno.Kv,
 ): Promise<CachedLatencyResponse> {
   while (true) {
@@ -127,18 +126,25 @@ async function setNewCachedResponse(
         response: latencyData,
       };
 
+      const queueWriteMessage: QueueMessage = {
+        nonce: crypto.randomUUID(),
+        serviceOp: `${service}:write`,
+        measurement: latencyData.latencies.write,
+      };
+      const queueReadMessage: QueueMessage = {
+        nonce: crypto.randomUUID(),
+        serviceOp: `${service}:read`,
+        measurement: latencyData.latencies.read,
+      };
+
       const finalResult = await db
         .atomic()
         .check({ key: serviceCachedKey, versionstamp: result.versionstamp })
-        .set(
-          [measurementKey, measurementReadKey, queryTime, service],
-          latencyData.latencies.read,
-        )
-        .set(
-          [measurementKey, measurementWriteKey, queryTime, service],
-          latencyData.latencies.write,
-        )
         .set(serviceCachedKey, cachedLatencyResponse)
+        .set([newMeasurementNonceKey, queueWriteMessage.nonce], true)
+        .set([newMeasurementNonceKey, queueReadMessage.nonce], true)
+        .enqueue(queueWriteMessage)
+        .enqueue(queueReadMessage)
         .commit();
 
       if (finalResult.ok) {
@@ -159,7 +165,6 @@ const db = await Deno.openKv();
 
 export const handler: Handlers = {
   async GET(_req: Request, _ctx: HandlerContext) {
-    const queryTime = new Date().getTime();
     const latencyDataRequests = Object
       .entries(config.backend_service_urls || {})
       .map(async ([service, url]) => {
@@ -180,7 +185,6 @@ export const handler: Handlers = {
           url,
           cachedResponseKey,
           cachedResponse,
-          queryTime,
           db,
         );
 
