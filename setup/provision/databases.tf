@@ -29,7 +29,7 @@ resource "aws_dynamodb_table" "dynamodb_global_table" {
     name            = local.dynamodb_table_gsi_index
     hash_key        = "host"
     range_key       = "forks_count"
-    projection_type = "KEYS_ONLY"
+    projection_type = "ALL"
   }
 }
 

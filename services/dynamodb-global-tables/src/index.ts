@@ -35,26 +35,15 @@ async function getTopN(
   let lastKey: {
     ExclusiveStartKey: Record<string, AttributeValue>;
   } = { ExclusiveStartKey: {} };
-  let documentIds: unknown[] = [];
+  let marshalledDocuments: Record<string, AttributeValue>[] = [];
 
-  while (documentIds.length < limit && lastKey.ExclusiveStartKey) {
+  while (marshalledDocuments.length < limit && lastKey.ExclusiveStartKey) {
     const queryResult = await client.query(queryParameters);
     lastKey = { ExclusiveStartKey: queryResult.LastEvaluatedKey! };
-    documentIds.push(...queryResult.Items!);
+    marshalledDocuments.push(...queryResult.Items!);
   }
 
-  const batchGetItemResult = await client.batchGetItem({
-    RequestItems: {
-      [tableName]: {
-        Keys: documentIds.map((indexKeys) => ({
-          id: (indexKeys as Record<string, AttributeValue>).id,
-        })),
-      },
-    },
-  });
-  const documents = batchGetItemResult
-    .Responses![tableName]
-    .map((record) => unmarshall(record));
+  const documents = marshalledDocuments.map((record) => unmarshall(record));
 
   return (documents as GithubRepoRecord[]).sort((a, b) =>
     b.forks_count - a.forks_count
