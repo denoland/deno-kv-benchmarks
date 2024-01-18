@@ -45,6 +45,8 @@ if (!tableName) {
   Deno.exit(1);
 }
 
+const delay = (duration: number) => new Promise((resolve) => setTimeout(resolve, duration));
+
 type SerializedDynamoDbValue =
   | { N: string }
   | { S: string }
@@ -170,11 +172,21 @@ for (let i = 0; i < dataset.length; i += batchInsertSize) {
       },
     }));
 
-  await client.batchWriteItem({
-    RequestItems: {
-      [tableName]: batch,
-    },
-  });
+  while (true) {
+    try {
+      await client.batchWriteItem({
+        RequestItems: {
+          [tableName]: batch,
+        },
+      });
+      // We succeeded in storing this batch
+      break;
+    } catch (error) {
+      console.log("FAILED TO POPULATE BATCH: ", error);
+      console.log("Waiting 20 seconds and trying again...");
+      await delay(20e3);
+    }
+  }
 }
 
 const reportedCount = await countDynamoDbRecords(client, tableName);
