@@ -71,6 +71,7 @@ read -r -d '' server_script_src <<'TYPESCRIPT'
   let tlsCert = "";
   let tlsKey = "";
   let certIsCreated = false;
+  let tcpServerHasStarted = false;
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -147,7 +148,9 @@ read -r -d '' server_script_src <<'TYPESCRIPT'
       return new Response("");
     }
 
-    if (!certIsCreated) {
+    if (certIsCreated) {
+      startTcpServer();
+    } else {
       const ip = pathname.slice(pathCertSecret.length);
       await loadCerts(ip);
 
@@ -162,6 +165,11 @@ read -r -d '' server_script_src <<'TYPESCRIPT'
   });
 
   async function startTcpServer() {
+    if (tcpServerHasStarted) {
+      return false;
+    }
+    tcpServerHasStarted = true;
+
     // TCP server for requests
     const listener = Deno.listenTls({
       cert: tlsCert,
