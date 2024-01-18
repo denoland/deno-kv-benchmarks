@@ -69,7 +69,7 @@ build_function() (
     reset_file_modified_dates
 
     rm -f "$artifact_zip"
-    TZ=UTC zip -q -r "$artifact_zip" . && {
+    TZ=UTC zip -X -q -r "$artifact_zip" . && {
       local filecount=$(find . | wc -l)
       local compressed_size=$(ls -lh "$artifact_zip" | awk '{ print $5 }')
       echo "zip: added ${filecount} files ($compressed_size compressed)"
