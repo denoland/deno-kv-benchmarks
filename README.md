@@ -6,6 +6,9 @@ read/write latency to databases and are hosted in a way to ensure that the
 latency excludes any network latency—by e.g. provisioning both the serverless
 function in the same AWS region as the respective database.
 
+For more details, check out
+[the blog post summary](https://deno.com/blog/comparing-deno-kv).
+
 ## Databases
 
 - [Deno KV]
