@@ -211,8 +211,10 @@ read -r -d '' server_script_src <<'TYPESCRIPT'
           })).text();
           const responseBuffer = encoder.encode(JSON.stringify(response));
           const responseSizeBuffer = new Uint32Array([responseBuffer.length]);
-          await conn.write(new Uint8Array(responseSizeBuffer.buffer));
-          await conn.write(responseBuffer);
+          const connWriter = conn.writable.getWriter();
+          await connWriter.write(new Uint8Array(responseSizeBuffer.buffer));
+          await connWriter.write(responseBuffer);
+          await connWriter.close();
         } catch (error) {
           console.error(`error: host:${hostname}`, error);
         }
